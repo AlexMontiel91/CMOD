@@ -15,13 +15,16 @@ import mx.infotec.imss.infrastructure.odwek.pool.ODServerPool;
  * encapsula el patron borrow -> logon -> accion -> logoff -> release/invalidate, de
  * modo que las capas de negocio nunca tocan el pool ni ODServer directamente.
  *
- * Decision clave (no revocar usuarios RACF): se distingue fallo de autenticacion
- * de error tecnico.
- *  - Logon rechazado (auth): el shell esta sano (nunca abrio sesion) -> se RELEASE
- *    al pool; se lanza InvalidCredentialsException para que la capa superior
- *    invalide la sesion y mande a re-login (sin reintentar).
- *  - Error tecnico (red/servidor) o fallo durante la transaccion: el shell es
- *    sospechoso -> se INVALIDATE (el pool lo destruye y recrea).
+ * Manejo de excepciones (la API de ODWEK declara java.lang.Exception, no solo
+ * ODException, por eso hay un catch tipado y otro generico):
+ *  - ODException -> se clasifica auth vs tecnico.
+ *      * auth (logon rechazado por RACF): el shell esta sano (nunca abrio sesion)
+ *        -> se RELEASE; se lanza InvalidCredentialsException para que la capa
+ *        superior invalide la sesion y mande a re-login (sin reintentar).
+ *      * tecnico: el shell es sospechoso -> se INVALIDATE (se destruye y recrea).
+ *  - Exception generica -> error tecnico -> se INVALIDATE.
+ *  - RuntimeException de la accion (de dominio o propia) -> se re-lanza tal cual,
+ *    sin envolver, e invalidando por precaucion (estado de sesion desconocido).
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -45,10 +48,12 @@ public class OnDemandTemplate implements OnDemandOperations {
                 server.logon(props.getServerName(), credentials.getUser(), new String(pwd));
                 loggedOn = true;
             } catch (ODException e) {
-                OnDemandException mapped = classifier.translateLogon(e);
                 // shell sano si fue rechazo de credenciales; sospechoso si fue tecnico
                 invalidate = !classifier.isAuthFailure(e);
-                throw mapped;
+                throw classifier.translateLogon(e);
+            } catch (Exception e) {
+                invalidate = true;
+                throw new OnDemandException("Fallo tecnico en logon OnDemand", e);
             }
 
             // --- accion de negocio ---
@@ -57,6 +62,12 @@ public class OnDemandTemplate implements OnDemandOperations {
             } catch (ODException e) {
                 invalidate = true; // conservador: ante fallo en sesion, no reusar la conexion
                 throw classifier.translate(e);
+            } catch (RuntimeException e) {
+                invalidate = true; // de dominio o propia: re-lanzar sin envolver
+                throw e;
+            } catch (Exception e) {
+                invalidate = true;
+                throw new OnDemandException("Error en operacion OnDemand", e);
             }
 
         } finally {
