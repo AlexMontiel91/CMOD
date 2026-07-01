@@ -1,37 +1,47 @@
+spring:
+  freemarker:
+    # necesario para acceder al token CSRF (_csrf) desde las plantillas .ftlh
+    expose-request-attributes: true
+    # sufijo por defecto en Spring Boot 2.x ya es .ftlh; se deja explicito
+    suffix: .ftlh
+
+# --- Llave de cifrado de la credencial en sesion (valor real en server.env) ---
+app:
+  security:
+    cipher-key: ${APP_SECURITY_CIPHER_KEY}
+
+# --- Conexion y pool de OnDemand ---
 ondemand:
-  # --- Conexion al servidor OnDemand (mainframe) ---
-  server-name: ${ONDEMAND_HOST}      # host o IP del library server. Si es invalido -> error id=2086 al arrancar
+  server-name: ${ONDEMAND_HOST}      # host o IP del library server
   port: 1234
-  application-name: IMSS             # etiqueta que ODWEK reporta en initialize() y en el System Log
-  max-hits: 200                      # tope de hits por busqueda (control de memoria)
+  application-name: IMSS
+  max-hits: 200
   language: ENU
-  temp-dir: /tmp/odwek               # opcional; default = java.io.tmpdir
+  temp-dir: /tmp/odwek
+  trace-level: 0                     # 0 = apagado; súbelo solo para diagnosticar
 
-  # --- Trace ODWEK (SIEMPRE false en prod; degrada rendimiento y no rota el archivo) ---
-  trace-enabled: false
-  trace-level: 0
-
-  # --- IDs de error de logon que son fallo de autenticacion (del manual Messages and Codes).
-  #     Vacio = todo fallo de logon se trata como tecnico. LLENAR antes de prod. ---
+  # IDs de error de logon que son fallo de autenticacion (del manual Messages and
+  # Codes). Vacio = todo fallo de logon se trata como tecnico. LLENAR antes de prod.
   # auth-error-ids:
   #   - 123
-  #   - 456
 
-  # --- TLS hacia OnDemand (GSKit). En dev puedes empezar con enabled:false para
-  #     descartar que un problema de conectividad sea por TLS. ---
   ssl:
     enabled: false
     key-ring-file: ${ONDEMAND_KEYRING}
     key-stash-file: ${ONDEMAND_KEYSTASH}
 
-  # --- Pool de conexiones ODServer ---
   pool:
-    max-total: 20                    # = transacciones OnDemand concurrentes (cruzar con limite/licencia z/OS)
+    max-total: 20
     max-idle: 20
     min-idle: 5
-    max-wait-millis: 3000            # espera maxima por un shell antes de fallar
-    test-on-borrow: true             # valida (isInitialized) antes de prestar
-    test-while-idle: true            # el evictor barre shells inservibles
+    max-wait-millis: 3000
+    test-on-borrow: true
+    test-while-idle: true
     time-between-eviction-runs-millis: 60000
     min-evictable-idle-time-millis: 300000
-    warm-up-on-startup: true         # precrea min-idle shells al arrancar
+    warm-up-on-startup: true
+
+# --- Logs utiles en dev (opcional) ---
+logging:
+  level:
+    mx.infotec.imss.infrastructure: INFO
