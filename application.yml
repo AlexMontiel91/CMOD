@@ -5,10 +5,13 @@ spring:
     # sufijo por defecto en Spring Boot 2.x ya es .ftlh; se deja explicito
     suffix: .ftlh
 
-# --- Llave de cifrado de la credencial en sesion (valor real en server.env) ---
+# --- Seguridad de la aplicacion ---
 app:
   security:
-    cipher-key: ${APP_SECURITY_CIPHER_KEY}
+    cipher-key: ${APP_SECURITY_CIPHER_KEY}   # llave AES (valor real en server.env)
+    login:
+      max-attempts: 2      # RACF revoca a los 3; cortamos antes. Confirmar REVOKE(n) con RACF.
+      lock-minutes: 15     # enfriamiento anti-martilleo (no reinicia el contador RACF)
 
 # --- Conexion y pool de OnDemand ---
 ondemand:
