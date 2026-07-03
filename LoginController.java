@@ -45,11 +45,18 @@ public class LoginController {
     private final LoginAttemptService loginAttempts;
 
     @GetMapping("/login")
-    public String showLogin(@RequestParam(required = false) String logout, Model model) {
+    public String showLogin(@RequestParam(required = false) String logout,
+                            @RequestParam(required = false) String expired,
+                            @RequestParam(required = false) String idle,
+                            @RequestParam(required = false) String denied,
+                            Model model) {
         if (!model.containsAttribute("loginForm")) {
             model.addAttribute("loginForm", new LoginForm());
         }
         model.addAttribute("logout", logout != null);
+        model.addAttribute("expired", expired != null);
+        model.addAttribute("idle", idle != null);
+        model.addAttribute("denied", denied != null);
         return "login";
     }
 

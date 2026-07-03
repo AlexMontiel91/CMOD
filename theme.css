@@ -101,3 +101,13 @@ html, body {
 .text-secondary {
     color: var(--imss-pewter);
 }
+
+/* Botones de paginacion (tabla de folders) */
+#folder-prev:hover:not(:disabled),
+#folder-next:hover:not(:disabled) {
+    background-color: var(--imss-light-pearl);
+}
+#folder-prev:disabled,
+#folder-next:disabled {
+    pointer-events: none;
+}

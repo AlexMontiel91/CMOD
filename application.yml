@@ -12,6 +12,12 @@ app:
     login:
       max-attempts: 2      # RACF revoca a los 3; cortamos antes. Confirmar REVOKE(n) con RACF.
       lock-minutes: 15     # enfriamiento anti-martilleo (no reinicia el contador RACF)
+    idle:
+      # Minutos de inactividad tras los cuales el NAVEGADOR cierra la sesion
+      # proactivamente (protege pantallas desatendidas). Esto es UX, no la
+      # seguridad real: mantener igual o MENOR al invalidationTimeout de
+      # <httpSession> en server.xml (control real, del lado servidor).
+      timeout-minutes: 15
 
 # --- Conexion y pool de OnDemand ---
 ondemand:

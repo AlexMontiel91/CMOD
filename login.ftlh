@@ -34,6 +34,27 @@
                     </div>
                 </#if>
 
+                <#-- Sesion expirada / credencial ya no valida (warning) -->
+                <#if expired?? && expired>
+                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                        <@spring.message "login.session.expired"/>
+                    </div>
+                </#if>
+
+                <#-- Logout por inactividad (warning) -->
+                <#if idle?? && idle>
+                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                        <@spring.message "login.session.idle"/>
+                    </div>
+                </#if>
+
+                <#-- Acceso denegado / CSRF invalido (warning) -->
+                <#if denied?? && denied>
+                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                        <@spring.message "login.access.denied"/>
+                    </div>
+                </#if>
+
                 <#-- Errores globales (credenciales, bloqueo, servicio) -->
                 <@spring.bind "loginForm"/>
                 <#if spring.status.errorMessages?size gt 0>
