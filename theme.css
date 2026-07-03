@@ -50,6 +50,10 @@ html, body {
 }
 .btn-imss:hover { background-color: var(--imss-red-error); }
 .btn-imss:focus-visible { outline: 2px solid var(--imss-red-error); outline-offset: 2px; }
+.btn-imss:disabled {
+    opacity: .8;
+    cursor: wait;
+}
 
 /* Barra de acento superior de la tarjeta */
 .accent-bar {

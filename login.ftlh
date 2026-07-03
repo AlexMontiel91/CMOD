@@ -102,8 +102,15 @@
                         </#list>
                     </div>
 
-                    <button type="submit" class="btn-imss w-full rounded-lg text-sm font-medium py-3 mt-2">
-                        <@spring.message "login.submit"/>
+                    <button type="submit" id="login-submit-btn"
+                            data-loading-text="<@spring.message "login.submitting"/>"
+                            class="btn-imss w-full rounded-lg text-sm font-medium py-3 mt-2 flex items-center justify-center gap-2">
+                        <svg id="login-spinner" class="hidden animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                             fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span id="login-submit-text"><@spring.message "login.submit"/></span>
                     </button>
                 </form>
             </div>
@@ -112,5 +119,6 @@
         <p class="text-center text-xs text-secondary mt-6">Instituto Mexicano del Seguro Social</p>
     </div>
 
+    <script src="/js/login-submit.js"></script>
 </body>
 </html>
