@@ -30,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableConfigurationProperties({CipherProperties.class, LoginAttemptProperties.class, IdleSessionProperties.class})
+@EnableConfigurationProperties({CipherProperties.class, LoginAttemptProperties.class,
+        IdleSessionProperties.class, PasswordExpiryProperties.class})
 public class SecurityConfig {
 
     private final OnDemandAuthenticationProvider authenticationProvider;

@@ -22,6 +22,10 @@ app:
       # seguridad real: mantener igual o MENOR al invalidationTimeout de
       # <httpSession> en server.xml (control real, del lado servidor).
       timeout-minutes: 15
+    password-expiry:
+      # Dias de anticipacion para mostrar el aviso "su password vence pronto"
+      # en el home. El dato real viene de ODUser.getNumDaysUntilPWExp().
+      warn-days: 14
 
 # --- Conexion y pool de OnDemand ---
 ondemand:

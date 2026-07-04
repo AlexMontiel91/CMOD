@@ -34,7 +34,29 @@
         <h1 class="text-2xl font-bold tracking-tight" style="color: var(--imss-black);">
             <@spring.message "home.welcome"/>, ${username!""}
         </h1>
+
+        <#if lastLogonFormatted?? || (firstLogin?? && firstLogin) || (loginInfo?? && loginInfo.failedLoginsSinceLastSuccess gt 0)>
+            <p class="text-secondary text-sm mt-1">
+                <#if lastLogonFormatted??>
+                    <@spring.message "home.lastLogin.label"/>: ${lastLogonFormatted}
+                <#elseif firstLogin?? && firstLogin>
+                    <@spring.message "home.firstLogin"/>
+                </#if>
+                <#if loginInfo?? && loginInfo.failedLoginsSinceLastSuccess gt 0>
+                    <#if lastLogonFormatted?? || (firstLogin?? && firstLogin)>&nbsp;&middot;&nbsp;</#if>
+                    <@spring.message "home.failedLogins.label"/>: ${loginInfo.failedLoginsSinceLastSuccess}
+                </#if>
+            </p>
+        </#if>
+
         <p class="text-secondary mt-2 mb-8"><@spring.message "home.session.ok"/></p>
+
+        <#if passwordExpiringInDays??>
+            <div class="alert-warning rounded-lg px-4 py-3 text-sm mb-6">
+                <@spring.message "home.password.expiring.prefix"/> ${passwordExpiringInDays}
+                <@spring.message "home.password.expiring.suffix"/>
+            </div>
+        </#if>
 
         <#-- Error tecnico al cargar folders -->
         <#if folderError?? && folderError>
