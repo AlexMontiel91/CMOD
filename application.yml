@@ -4,6 +4,10 @@ spring:
     expose-request-attributes: true
     # sufijo por defecto en Spring Boot 2.x ya es .ftlh; se deja explicito
     suffix: .ftlh
+    # requerido por el builtin ?url (usado en /folder/${folder.name?url}): sin
+    # esto, FreeMarker lanza "the URL escaping charset was not specified".
+    settings:
+      url_escaping_charset: UTF-8
 
 # --- Seguridad de la aplicacion ---
 app:

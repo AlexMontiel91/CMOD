@@ -2,6 +2,7 @@ package mx.infotec.imss.application.port.out;
 
 import java.util.List;
 
+import mx.infotec.imss.domain.model.FolderSearchDefinition;
 import mx.infotec.imss.domain.model.FolderSummary;
 
 /**
@@ -13,4 +14,7 @@ public interface FolderRepository {
 
     /** Folders a los que el usuario autenticado en la peticion actual tiene acceso. */
     List<FolderSummary> findAssignedFolders();
+
+    /** Definicion del formulario de busqueda (campos, tipos, operadores) de un folder. */
+    FolderSearchDefinition findSearchDefinition(String folderName);
 }

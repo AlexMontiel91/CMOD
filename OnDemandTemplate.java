@@ -5,6 +5,7 @@ import java.util.Arrays;
 import com.ibm.edms.od.ODException;
 import com.ibm.edms.od.ODServer;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mx.infotec.imss.infrastructure.odwek.config.OnDemandProperties;
@@ -35,7 +36,7 @@ public class OnDemandTemplate implements OnDemandOperations {
     private final ODErrorClassifier classifier;
 
     @Override
-    public <T> T execute(OnDemandCredentials credentials, ODServerCallback<T> action) {
+    public <T> T execute(@NonNull OnDemandCredentials credentials, @NonNull ODServerCallback<T> action) {
         ODServer server = null;
         boolean loggedOn = false;
         boolean invalidate = false;

@@ -55,6 +55,22 @@ html, body {
     cursor: wait;
 }
 
+/* Boton secundario (p. ej. "Limpiar formulario"): menos peso visual que el primario rojo */
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--imss-black);
+    color: var(--imss-black);
+    transition: background-color .15s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--imss-light-pearl);
+}
+.btn-secondary:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* Barra de acento superior de la tarjeta */
 .accent-bar {
     background: linear-gradient(90deg, var(--imss-red) 0%, var(--imss-red-error) 100%);

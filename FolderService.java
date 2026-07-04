@@ -6,11 +6,12 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import mx.infotec.imss.application.port.out.FolderRepository;
+import mx.infotec.imss.domain.model.FolderSearchDefinition;
 import mx.infotec.imss.domain.model.FolderSummary;
 
 /**
- * Caso de uso: listar los folders que el usuario actual tiene asignados. Punto de
- * extension natural para reglas futuras (orden preferido, filtros, cache).
+ * Caso de uso: folders asignados y su definicion de busqueda. Punto de extension
+ * natural para reglas futuras (orden preferido, filtros, cache).
  */
 @Service
 @RequiredArgsConstructor
@@ -20,5 +21,9 @@ public class FolderService {
 
     public List<FolderSummary> listAssignedFolders() {
         return folderRepository.findAssignedFolders();
+    }
+
+    public FolderSearchDefinition getSearchDefinition(String folderName) {
+        return folderRepository.findSearchDefinition(folderName);
     }
 }
