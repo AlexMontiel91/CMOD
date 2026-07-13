@@ -1,0 +1,70 @@
+spring:
+  freemarker:
+    # necesario para acceder al token CSRF (_csrf) desde las plantillas .ftlh
+    expose-request-attributes: true
+    # sufijo por defecto en Spring Boot 2.x ya es .ftlh; se deja explicito
+    suffix: .ftlh
+    # requerido por el builtin ?url (usado en /folder/${folder.name?url}): sin
+    # esto, FreeMarker lanza "the URL escaping charset was not specified".
+    settings:
+      url_escaping_charset: UTF-8
+
+# --- Seguridad de la aplicacion ---
+app:
+  security:
+    cipher-key: ${APP_SECURITY_CIPHER_KEY}   # llave AES (valor real en server.env)
+    login:
+      max-attempts: 2      # RACF revoca a los 3; cortamos antes. Confirmar REVOKE(n) con RACF.
+      lock-minutes: 15     # enfriamiento anti-martilleo (no reinicia el contador RACF)
+    idle:
+      # Minutos de inactividad tras los cuales el NAVEGADOR cierra la sesion
+      # proactivamente (protege pantallas desatendidas). Esto es UX, no la
+      # seguridad real: mantener igual o MENOR al invalidationTimeout de
+      # <httpSession> en server.xml (control real, del lado servidor).
+      timeout-minutes: 15
+    password-expiry:
+      # Dias de anticipacion para mostrar el aviso "su password vence pronto"
+      # en el home. El dato real viene de ODUser.getNumDaysUntilPWExp().
+      warn-days: 14
+
+# --- Conexion y pool de OnDemand ---
+ondemand:
+  server-name: ${ONDEMAND_HOST}      # host o IP del library server
+  port: 1234
+  application-name: IMSS
+  max-hits: 200
+  language: ENU
+  temp-dir: /tmp/odwek
+  trace-level: 0                     # 0 = apagado; súbelo solo para diagnosticar
+
+  # IDs de error de logon que son fallo de autenticacion (del manual Messages and
+  # Codes / confirmados empiricamente). Vacio = todo fallo de logon se trata como
+  # tecnico. Ver [ODWEK errorId] en el log para descubrir nuevos.
+  auth-error-ids:
+    - 2107   # ARS2107E: usuario o password invalido (confirmado empiricamente)
+
+  # IDs de error que significan "password vencido, requiere cambio" (NO cuenta
+  # para el bloqueo de intentos). 2061 confirmado empiricamente.
+  password-expired-error-ids:
+    - 2061
+
+  ssl:
+    enabled: false
+    key-ring-file: ${ONDEMAND_KEYRING}
+    key-stash-file: ${ONDEMAND_KEYSTASH}
+
+  pool:
+    max-total: 20
+    max-idle: 20
+    min-idle: 5
+    max-wait-millis: 3000
+    test-on-borrow: true
+    test-while-idle: true
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 300000
+    warm-up-on-startup: true
+
+# --- Logs utiles en dev (opcional) ---
+logging:
+  level:
+    mx.infotec.imss.infrastructure: INFO

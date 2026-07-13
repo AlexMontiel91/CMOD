@@ -1,0 +1,133 @@
+/* ===========================================================================
+   Tema corporativo IMSS — estilo FINTECH MODERNA
+   ---------------------------------------------------------------------------
+   Fuente: la que trae Tailwind por defecto (system font stack). No se declara
+   font-family propia a proposito.
+   =========================================================================== */
+
+:root {
+    /* --- Marca --- */
+    --app-red: #DB0011;          /* primario */
+    --app-black: #000000;        /* secundario */
+    --app-white: #FFFFFF;
+
+    /* --- Fondos y superficies --- */
+    --app-light-pearl: #F3F3F3;  /* fondos */
+    --app-pearl: #EDEDED;
+    --app-silver: #D7D8D6;       /* borders de cards/tablas */
+
+    /* --- Texto --- */
+    --app-pewter: #767676;       /* texto secundario */
+    --app-charcoal: #333333;     /* texto general */
+
+    /* --- Semanticos: error --- */
+    --app-red-error: #A8000B;
+    --app-red-error-tint: #F9F2F3;
+
+    /* --- Semanticos: warning --- */
+    --app-amber: #FFBB33;
+    --app-amber-tint: #FFF8EA;
+
+    /* --- Semanticos: success --- */
+    --app-green: #00847F;
+    --app-green-tint: #E5F2F2;
+
+    /* --- Semanticos: info --- */
+    --app-blue: #305A85;
+    --app-blue-tint: #EBEFF4;
+}
+
+html, body {
+    background-color: var(--app-light-pearl);
+    color: var(--app-charcoal);
+}
+
+/* Botón primario corporativo */
+.btn-primary {
+    background-color: var(--app-red);
+    color: var(--app-white);
+    transition: background-color .15s ease;
+}
+.btn-primary:hover { background-color: var(--app-red-error); }
+.btn-primary:focus-visible { outline: 2px solid var(--app-red-error); outline-offset: 2px; }
+.btn-primary:disabled {
+    opacity: .8;
+    cursor: wait;
+}
+
+/* Boton secundario (p. ej. "Limpiar formulario"): menos peso visual que el primario rojo */
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--app-black);
+    color: var(--app-black);
+    transition: background-color .15s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--app-light-pearl);
+}
+.btn-secondary:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Barra de acento superior de la tarjeta */
+.accent-bar {
+    background: linear-gradient(90deg, var(--app-red) 0%, var(--app-red-error) 100%);
+}
+
+/* Foco de inputs en rojo corporativo */
+.input-app {
+    border-color: var(--app-silver);
+    color: var(--app-charcoal);
+}
+.input-app:focus {
+    outline: none;
+    border-color: var(--app-red);
+    box-shadow: 0 0 0 3px rgba(219, 0, 17, .15);
+}
+.input-app.has-error {
+    border-color: var(--app-red-error);
+}
+
+/* --- Alertas semanticas (usar junto a las clases de Tailwind de layout) --- */
+.alert-error {
+    background-color: var(--app-red-error-tint);
+    border: 1px solid var(--app-red-error);
+    color: var(--app-red-error);
+}
+.alert-warning {
+    background-color: var(--app-amber-tint);
+    border: 1px solid var(--app-amber);
+    color: #8a6100; /* variante oscura del amber para contraste de texto (AA) */
+}
+.alert-success {
+    background-color: var(--app-green-tint);
+    border: 1px solid var(--app-green);
+    color: var(--app-green);
+}
+.alert-info {
+    background-color: var(--app-blue-tint);
+    border: 1px solid var(--app-blue);
+    color: var(--app-blue);
+}
+
+/* Texto de error bajo un campo de formulario */
+.field-error {
+    color: var(--app-red-error);
+}
+
+/* Texto secundario / ayuda */
+.text-secondary {
+    color: var(--app-pewter);
+}
+
+/* Botones de paginacion (tabla de folders) */
+#folder-prev:hover:not(:disabled),
+#folder-next:hover:not(:disabled) {
+    background-color: var(--app-light-pearl);
+}
+#folder-prev:disabled,
+#folder-next:disabled {
+    pointer-events: none;
+}
