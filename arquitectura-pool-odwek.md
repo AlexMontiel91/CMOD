@@ -1,10 +1,18 @@
 # Módulo OnDemand — Pool de conexiones ODServer
 
-Alcance actual del entregable: **solo la capa de conexión a OnDemand** (pool de
-objetos `ODServer` + template). Aún no incluye sesiones (quién produce el
-`OnDemandCredentials`) ni documentos (quién usa `OnDemandOperations`).
+Este documento describe **la capa de conexión a OnDemand**: el pool de objetos
+`ODServer` + el template que orquesta cada transacción. Es el corazón del sistema
+y el resto de la app se apoya en él.
 
-Paquete raíz: `mx.infotec.imss.infrastructure.odwek`
+Nota de alcance: la app ya creció más allá de esta capa. Hoy existen también la
+autenticación (`infrastructure/security/OnDemandAuthenticationProvider`, que
+produce las credenciales), la búsqueda de folders
+(`infrastructure/odwek/adapter/CmodFolderRepository`, que consume
+`OnDemandOperations`) y el cambio de password vencido. Todos esos consumidores
+entran por el mismo `OnDemandOperations` que aquí se documenta; los diagramas de
+abajo cubren la capa de conexión, no esos casos de uso.
+
+Paquete raíz: `com.app.icncards.infrastructure.odwek`
 
 ```
 infrastructure/odwek/
@@ -46,6 +54,7 @@ classDiagram
     class OnDemandOperations {
         <<interface>>
         +execute(creds, action) T
+        +changeExpiredPassword(user, oldPwd, newPwd) void
     }
 
     class OnDemandTemplate {
@@ -53,6 +62,7 @@ classDiagram
         -OnDemandProperties props
         -ODErrorClassifier classifier
         +execute(creds, action) T
+        +changeExpiredPassword(user, oldPwd, newPwd) void
     }
 
     class ODServerCallback {
@@ -68,6 +78,7 @@ classDiagram
 
     class ODErrorClassifier {
         +isAuthFailure(e) boolean
+        +isPasswordExpired(e) boolean
         +translateLogon(e) OnDemandException
         +translate(e) OnDemandException
     }
@@ -142,6 +153,49 @@ sequenceDiagram
         T->>S: logoff() (en finally)
         T->>P: release(server)
         T-->>C: resultado
+    end
+```
+
+---
+
+## 2b. Diagrama de secuencia — cambio de password vencido
+
+`changeExpiredPassword(...)` no ejecuta una acción de negocio: su único fin es el
+**logon de 4 argumentos** de ODWEK, donde RACF exige la contraseña **vencida** para
+autorizar el cambio a la nueva. No hay `logoff` de una sesión de trabajo (nunca se
+abrió una sesión normal); el shell se devuelve o invalida según el tipo de error,
+con la misma regla auth/técnico.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Cliente (ChangePasswordController)
+    participant T as OnDemandTemplate
+    participant P as ODServerPool
+    participant S as ODServer
+    participant M as OnDemand (mainframe)
+
+    C->>T: changeExpiredPassword(user, oldPwd, newPwd)
+    T->>P: borrow()
+    P-->>T: ODServer (shell sin logon)
+    T->>S: logon(host, user, oldPwd, newPwd)
+    S->>M: cambio de password RACF
+
+    alt password viejo inválido / aún vencido (auth)
+        M-->>S: error de credenciales
+        T->>P: release(server)
+        Note over T,P: shell sano: vuelve al pool
+        T-->>C: OnDemandException (traducida)
+    else error técnico (red / servidor)
+        M-->>S: error técnico
+        T->>P: invalidate(server)
+        Note over T,P: shell sospechoso: se destruye y recrea
+        T-->>C: OnDemandException
+    else cambio aceptado
+        M-->>S: password actualizado
+        T->>P: release(server)
+        Note over T: en finally: se limpian oldPwd y newPwd (Arrays.fill)
+        T-->>C: (void) OK
     end
 ```
 
