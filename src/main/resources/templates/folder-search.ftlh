@@ -1,38 +1,17 @@
 <#import "/spring.ftl" as spring/>
+<#import "_layout.ftlh" as ui/>
 <#-- Titulo = nombre del folder (ODFolder.getName, fiable); subtitulo = descripcion
      (getDescription, puede venir vacia). Se blindan con ?has_content porque el operador
      ! de FreeMarker NO cae al alterno con cadena vacia "", solo con null. -->
 <#assign folderTitle = (definition.folderName)!''>
 <#if !folderTitle?has_content><#assign folderTitle = (definition.folderDescription)!''></#if>
 <#assign folderDesc = (definition.folderDescription)!''>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${folderTitle} — <@spring.message "app.name"/></title>
-    <link rel="stylesheet" href="/css/theme.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen" data-idle-timeout-minutes="${idleTimeoutMinutes!0}">
+<@ui.page title=folderTitle bodyClass="min-h-screen" idle=true>
 
-    <header class="app-header">
-        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="brand">
-                <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
-                <span><@spring.message "app.name"/></span>
-            </div>
-            <form method="post" action="/logout">
-                <#if _csrf??>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                </#if>
-                <button type="submit" class="link"><@spring.message "home.logout"/></button>
-            </form>
-        </div>
-    </header>
+    <@ui.appHeader/>
 
     <main class="max-w-3xl mx-auto px-6 py-10">
-        <a href="/" class="link">&larr; <@spring.message "folder.search.back"/></a>
+        <a href="<@spring.url '/'/>" class="link">&larr; <@spring.message "folder.search.back"/></a>
 
         <h1 class="h-display text-2xl mt-4">${folderTitle}</h1>
         <#if folderDesc?has_content && folderDesc != folderTitle>
@@ -67,13 +46,11 @@
             </#if>
 
             <form id="folder-search-form" method="post"
-                  action="/folder/${definition.folderName?url}/search"
+                  action="<@spring.url '/folder/${definition.folderName?url}/search'/>"
                   data-two-value-operators="${twoValueOperators!''}"
                   class="surface p-6 sm:p-8">
 
-                <#if _csrf??>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                </#if>
+                <@ui.csrf/>
 
                 <#-- Encabezado tipo tabla (solo visible en pantallas >= sm) -->
                 <div class="hidden sm:grid sm:grid-cols-[1fr_11rem_1fr] gap-4 pb-3 mb-1 border-b"
@@ -207,14 +184,5 @@
         </#if>
     </main>
 
-    <#-- Form oculto para el logout por inactividad (idle-timeout.js). CSRF-protegido. -->
-    <form id="idle-logout-form" method="post" action="/logout?reason=idle" class="hidden">
-        <#if _csrf??>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </#if>
-    </form>
-    <script src="/js/idle-timeout.js"></script>
-    <script src="/js/folder-search-form.js"></script>
-
-</body>
-</html>
+    <script src="<@spring.url '/js/folder-search-form.js'/>"></script>
+</@ui.page>

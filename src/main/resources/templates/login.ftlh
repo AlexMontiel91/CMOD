@@ -1,29 +1,15 @@
 <#import "/spring.ftl" as spring/>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title><@spring.message "login.title"/> — <@spring.message "app.name"/></title>
-    <link rel="stylesheet" href="/css/theme.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen flex items-center justify-center px-4 py-10">
+<#import "_layout.ftlh" as ui/>
+<#assign pageTitle><@spring.message "login.title"/></#assign>
+<@ui.page title=pageTitle noindex=true bodyClass="min-h-screen flex items-center justify-center px-4 py-10">
 
     <div class="w-full max-w-md">
         <div class="surface overflow-hidden">
-            <div class="record-strip">
-                <span>SIST <span class="rv">ICN·CMOD</span></span>
-                <span>SESIÓN <span class="rv">—</span></span>
-            </div>
+            <@ui.recordStrip rightLabel="SESIÓN" rightValue="—"/>
 
             <div class="p-8 sm:p-10">
                 <div class="mb-7">
-                    <div class="brand mb-5">
-                        <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
-                        <span><@spring.message "app.name"/></span>
-                    </div>
+                    <@ui.brand cls="mb-5"/>
                     <h1 class="h-display text-2xl"><@spring.message "login.title"/></h1>
                     <p class="meta mt-2">&gt; <@spring.message "login.subtitle"/></p>
                 </div>
@@ -73,11 +59,8 @@
                     </div>
                 </#if>
 
-                <form method="post" action="/login" autocomplete="off" novalidate class="space-y-5">
-                    <#-- CSRF (requiere spring.freemarker.expose-request-attributes=true) -->
-                    <#if _csrf??>
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    </#if>
+                <form method="post" action="<@spring.url '/login'/>" autocomplete="off" novalidate class="space-y-5">
+                    <@ui.csrf/>
 
                     <#-- Usuario -->
                     <div>
@@ -120,9 +103,8 @@
             </div>
         </div>
 
-        <p class="meta text-center mt-6"><@spring.message "app.footer"/></p>
+        <@ui.footer/>
     </div>
 
-    <script src="/js/login-submit.js"></script>
-</body>
-</html>
+    <script src="<@spring.url '/js/login-submit.js'/>"></script>
+</@ui.page>

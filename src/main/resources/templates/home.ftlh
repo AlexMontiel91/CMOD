@@ -1,29 +1,9 @@
 <#import "/spring.ftl" as spring/>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><@spring.message "home.pageTitle"/> — <@spring.message "app.name"/></title>
-    <link rel="stylesheet" href="/css/theme.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen" data-idle-timeout-minutes="${idleTimeoutMinutes!0}">
+<#import "_layout.ftlh" as ui/>
+<#assign pageTitle><@spring.message "home.pageTitle"/></#assign>
+<@ui.page title=pageTitle bodyClass="min-h-screen" idle=true>
 
-    <header class="app-header">
-        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="brand">
-                <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
-                <span><@spring.message "app.name"/></span>
-            </div>
-            <form method="post" action="/logout">
-                <#if _csrf??>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                </#if>
-                <button type="submit" class="link"><@spring.message "home.logout"/></button>
-            </form>
-        </div>
-    </header>
+    <@ui.appHeader/>
 
     <main class="max-w-3xl mx-auto px-6 py-12">
         <h1 class="h-display text-2xl"><@spring.message "home.welcome"/>, ${username!""}</h1>
@@ -80,7 +60,7 @@
                  data-info-template="<@spring.message "home.folders.pagination.info"/>">
                 <div id="folder-table-body">
                     <#list folders as folder>
-                        <a class="idxrow" href="/folder/${folder.name?url}"
+                        <a class="idxrow" href="<@spring.url '/folder/${folder.name?url}'/>"
                            data-search="${(folder.name + ' ' + folder.description!'')?lower_case}">
                             <span class="idxn">${(folder?index + 1)?string("00")}</span>
                             <span class="min-w-0">
@@ -112,7 +92,7 @@
                 </div>
             </div>
 
-            <script src="/js/folder-table.js"></script>
+            <script src="<@spring.url '/js/folder-table.js'/>"></script>
         <#elseif !(folderError?? && folderError)>
             <div class="alert alert-info px-4 py-3 text-sm">
                 <@spring.message "home.folders.empty"/>
@@ -120,13 +100,4 @@
         </#if>
     </main>
 
-    <#-- Form oculto para el logout por inactividad (idle-timeout.js). CSRF-protegido. -->
-    <form id="idle-logout-form" method="post" action="/logout?reason=idle" class="hidden">
-        <#if _csrf??>
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </#if>
-    </form>
-    <script src="/js/idle-timeout.js"></script>
-
-</body>
-</html>
+</@ui.page>

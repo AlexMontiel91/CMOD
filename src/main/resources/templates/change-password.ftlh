@@ -1,29 +1,15 @@
 <#import "/spring.ftl" as spring/>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title><@spring.message "changePassword.title"/> — <@spring.message "app.name"/></title>
-    <link rel="stylesheet" href="/css/theme.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen flex items-center justify-center px-4 py-10">
+<#import "_layout.ftlh" as ui/>
+<#assign pageTitle><@spring.message "changePassword.title"/></#assign>
+<@ui.page title=pageTitle noindex=true bodyClass="min-h-screen flex items-center justify-center px-4 py-10">
 
     <div class="w-full max-w-md">
         <div class="surface overflow-hidden">
-            <div class="record-strip">
-                <span>SIST <span class="rv">ICN·CMOD</span></span>
-                <span>MODO <span class="rv">CAMBIO</span></span>
-            </div>
+            <@ui.recordStrip rightLabel="MODO" rightValue="CAMBIO"/>
 
             <div class="p-8 sm:p-10">
                 <div class="mb-6">
-                    <div class="brand mb-5">
-                        <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
-                        <span><@spring.message "app.name"/></span>
-                    </div>
+                    <@ui.brand cls="mb-5"/>
                     <h1 class="h-display text-2xl"><@spring.message "changePassword.title"/></h1>
                 </div>
 
@@ -41,10 +27,8 @@
                     </div>
                 </#if>
 
-                <form method="post" action="/change-password" autocomplete="off" novalidate class="space-y-5">
-                    <#if _csrf??>
-                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    </#if>
+                <form method="post" action="<@spring.url '/change-password'/>" autocomplete="off" novalidate class="space-y-5">
+                    <@ui.csrf/>
 
                     <@spring.bind "changePasswordForm.user"/>
                     <input type="hidden" name="user" value="${spring.status.value!''}"/>
@@ -112,10 +96,8 @@
             </div>
         </div>
 
-        <p class="meta text-center mt-6"><@spring.message "app.footer"/></p>
+        <@ui.footer/>
     </div>
 
-    <script src="/js/change-password-submit.js"></script>
-
-</body>
-</html>
+    <script src="<@spring.url '/js/change-password-submit.js'/>"></script>
+</@ui.page>

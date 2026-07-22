@@ -10,16 +10,18 @@
    usan CDNs de fuentes.
    =========================================================================== */
 
+/* Rutas relativas al propio CSS (/css/ -> /fonts/): context-safe sin la macro
+   spring.url, que no aplica dentro de un .css estatico. */
 @font-face {
     font-family: "Archivo";
-    src: url("/fonts/archivo-600.woff2") format("woff2");
+    src: url("../fonts/archivo-600.woff2") format("woff2");
     font-weight: 600;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: "Archivo";
-    src: url("/fonts/archivo-700.woff2") format("woff2");
+    src: url("../fonts/archivo-700.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;

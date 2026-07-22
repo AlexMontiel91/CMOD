@@ -8,8 +8,11 @@
     'use strict';
 
     function init() {
-        var form = document.querySelector('form[action="/change-password"]');
+        // El form se obtiene desde el boton (btn.form), no por action="/change-password":
+        // asi la ruta puede generarse con <@spring.url> (context root) sin acoplar el
+        // selector a la ruta literal.
         var btn = document.getElementById('change-password-submit-btn');
+        var form = btn ? btn.form : null;
         var textEl = document.getElementById('change-password-submit-text');
         var spinner = document.getElementById('change-password-spinner');
         if (!form || !btn) {

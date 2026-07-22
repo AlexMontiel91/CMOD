@@ -18,8 +18,11 @@
     'use strict';
 
     function initLoginSubmit() {
-        var form = document.querySelector('form[action="/login"]');
+        // El form se obtiene desde el boton (btn.form), no por action="/login":
+        // asi la ruta puede generarse con <@spring.url> (context root) sin que el
+        // selector dependa de la ruta literal.
         var btn = document.getElementById('login-submit-btn');
+        var form = btn ? btn.form : null;
         var textEl = document.getElementById('login-submit-text');
         var spinner = document.getElementById('login-spinner');
         if (!form || !btn) {
