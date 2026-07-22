@@ -145,14 +145,32 @@ reutilizables (se importan como `<#import "_layout.ftlh" as ui/>`):
   completo: `<head>` (con CSS/Tailwind), `<body>`, y si `idle=true` agrega
   `data-idle-timeout-minutes` + el form/script de inactividad. El contenido propio de la vista
   va como `<#nested>`.
-- `<@ui.appHeader/>` (marca + cerrar sesión, pantallas internas), `<@ui.recordStrip rightLabel rightValue/>`
-  (tira negra de las tarjetas), `<@ui.brand cls=""/>`, `<@ui.footer/>`, `<@ui.csrf/>`.
+- `<@ui.appHeader/>` (header de pantallas internas: logo + datos de sesión + cerrar sesión — ver
+  abajo), `<@ui.recordStrip rightLabel rightValue/>` (tira negra de las tarjetas login/cambio/error),
+  `<@ui.brand cls=""/>` (logo SVG + nombre; el SVG es placeholder, reemplazar por el real),
+  `<@ui.footer/>`, `<@ui.csrf/>`.
 
 Al crear/editar una vista: úsala sobre `<@ui.page>`, **no** repitas `<!DOCTYPE>`/`<head>`/header/footer
 (deben existir solo en `_layout.ftlh`). El data model (`_csrf`, `idleTimeoutMinutes`, mensajes)
 es **global** en todos los namespaces, por lo que las macros lo leen sin recibirlo por parámetro.
 El título se pasa ya resuelto: para mensajes, captúralo antes con
 `<#assign pageTitle><@spring.message "x.title"/></#assign>`.
+
+### Header global y datos de sesión
+
+El header de pantallas internas (`<@ui.appHeader/>`, usado en `home` y `folder-search`) muestra en
+**todas** las vistas autenticadas: logo + nombre, «Bienvenido, {usuario}», última conexión / primer
+acceso, intentos fallidos, y «Cerrar sesión». Esos datos NO los pone cada controller: los expone
+**`GlobalModelAttributes`** con un `@ModelAttribute` que lee el principal `OnDemandUserDetails` del
+`SecurityContext` y agrega al modelo `username`, `lastLogonFormatted` **o** `firstLogin`, y
+`failedLogins`. En vistas sin sesión (login, error) no agrega nada (y esas vistas no usan el header).
+
+Reglas al tocar esto: los datos de sesión del header viven en `GlobalModelAttributes`, **no** en los
+controllers (`HomeController` solo aporta `folders` + `passwordExpiringInDays`). Si una vista interna
+nueva necesita el header, basta con `<@ui.appHeader/>` — los datos ya están en el modelo. El formato de
+fecha (`dd/MM/yyyy HH:mm`, zona `America/Mexico_City`) y el umbral de «primer acceso» también viven ahí.
+Las etiquetas del header salen de `messages.properties` (`home.welcome`, `home.lastLogin.label`,
+`home.firstLogin`, `home.failedLogins.label`, `home.logout`).
 
 ### Rutas: siempre `<@spring.url>`
 
