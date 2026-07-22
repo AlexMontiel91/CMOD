@@ -135,6 +135,40 @@ errores en `.../advice/GlobalExceptionHandler` y datos de modelo compartidos en
 usuario viven en `messages.properties` (español) — agrega claves de mensaje ahí en vez de
 texto hardcodeado en plantillas o controllers.
 
+### Plantilla base FreeMarker (`_layout.ftlh`)
+
+FreeMarker no tiene herencia tipo Tiles/Thymeleaf-layout; se emula con **macros + `<#nested>`**.
+`templates/_layout.ftlh` centraliza lo que antes se duplicaba en cada vista y expone macros
+reutilizables (se importan como `<#import "_layout.ftlh" as ui/>`):
+
+- `<@ui.page title=... noindex=false bodyClass="" idle=false>…contenido…</@ui.page>` — shell
+  completo: `<head>` (con CSS/Tailwind), `<body>`, y si `idle=true` agrega
+  `data-idle-timeout-minutes` + el form/script de inactividad. El contenido propio de la vista
+  va como `<#nested>`.
+- `<@ui.appHeader/>` (marca + cerrar sesión, pantallas internas), `<@ui.recordStrip rightLabel rightValue/>`
+  (tira negra de las tarjetas), `<@ui.brand cls=""/>`, `<@ui.footer/>`, `<@ui.csrf/>`.
+
+Al crear/editar una vista: úsala sobre `<@ui.page>`, **no** repitas `<!DOCTYPE>`/`<head>`/header/footer
+(deben existir solo en `_layout.ftlh`). El data model (`_csrf`, `idleTimeoutMinutes`, mensajes)
+es **global** en todos los namespaces, por lo que las macros lo leen sin recibirlo por parámetro.
+El título se pasa ya resuelto: para mensajes, captúralo antes con
+`<#assign pageTitle><@spring.message "x.title"/></#assign>`.
+
+### Rutas: siempre `<@spring.url>`
+
+Toda ruta de recurso o endpoint en los `.ftlh` (CSS, JS, `href`, `action`) se genera con
+**`<@spring.url '/ruta'/>`** — nunca rutas absolutas hardcodeadas — para respetar el context
+root del WAR en Liberty. Funciona igual en cualquier atributo (`href`, `action`, `src`); usa
+comillas simples dentro de la macro. **No** uses `${request.contextPath}`: el objeto `request`
+no está expuesto en el modelo (`expose-request-attributes` expone *atributos*, no el `request`),
+mientras que `<@spring.url>` se apoya en `springMacroRequestContext` (el mismo helper de
+`<@spring.message>`, siempre disponible). Ver [[ftlh-rutas-spring-url]] en memoria.
+
+Casos borde: en `theme.css` (estático, la macro no aplica) las fuentes usan **ruta relativa**
+(`url("../fonts/…")`), que resuelve respecto al CSS y también es context-safe. Y si un `.js`
+necesita ubicar un form, que lo haga por `id`/`btn.form`, **no** por `form[action="/ruta"]`
+(quedaría acoplado a la ruta literal que ahora genera la macro).
+
 `infrastructure/**/devtest/` (p. ej. `OdwekConnectionTestRunner`,
 `SessionCredentialDebugController`) son ayudantes solo de diagnóstico — no los cables en
 flujos de producción.
