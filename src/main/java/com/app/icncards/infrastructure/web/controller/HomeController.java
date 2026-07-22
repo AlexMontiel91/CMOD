@@ -1,7 +1,5 @@
 package com.app.icncards.infrastructure.web.controller;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,16 +10,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.app.icncards.application.service.FolderService;
-import com.app.icncards.domain.model.UserLoginInfo;
 import com.app.icncards.infrastructure.odwek.connection.InvalidCredentialsException;
 import com.app.icncards.infrastructure.odwek.connection.OnDemandException;
 import com.app.icncards.infrastructure.security.OnDemandUserDetails;
 import com.app.icncards.infrastructure.security.PasswordExpiryProperties;
 
 /**
- * Home: muestra los folders asignados al usuario autenticado, y de forma
- * complementaria su "ultima conexion", intentos fallidos y aviso de contrasena
- * por vencer (capturados durante el login, sin llamada extra a OnDemand).
+ * Home: muestra los folders asignados al usuario autenticado y el aviso de
+ * contrasena por vencer. El usuario y los datos de "ultima conexion" / intentos
+ * fallidos los expone {@link GlobalModelAttributes} para el header comun de toda
+ * vista autenticada (antes se calculaban aqui).
  *
  * InvalidCredentialsException (credencial sellada ya no valida a media sesion) NO
  * se captura aqui: se deja propagar al GlobalExceptionHandler, que centraliza el
@@ -36,18 +34,14 @@ import com.app.icncards.infrastructure.security.PasswordExpiryProperties;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private static final ZoneId MX_ZONE = ZoneId.of("America/Mexico_City");
-    private static final DateTimeFormatter LAST_LOGON_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
     private final FolderService folderService;
     private final PasswordExpiryProperties passwordExpiryProperties;
 
     @GetMapping("/")
     public String home(@AuthenticationPrincipal OnDemandUserDetails principal, Model model) {
-        String username = principal != null ? principal.getUsername() : "";
-        model.addAttribute("username", username);
-        addLoginInfo(principal, model);
+        addPasswordExpiryWarning(principal, model);
 
+        String username = principal != null ? principal.getUsername() : "";
         try {
             model.addAttribute("folders", folderService.listAssignedFolders());
 
@@ -63,36 +57,16 @@ public class HomeController {
         return "home";
     }
 
-    /** Expone ultima conexion (formateada), intentos fallidos y aviso de password. */
-    private void addLoginInfo(OnDemandUserDetails principal, Model model) {
+    /** Aviso de contrasena por vencer (dato capturado en el login, dentro del principal). */
+    private void addPasswordExpiryWarning(OnDemandUserDetails principal, Model model) {
         if (principal == null || principal.getLoginInfo() == null) {
             return;
         }
-        UserLoginInfo info = principal.getLoginInfo();
-        model.addAttribute("loginInfo", info);
-
-        if (isFirstLogin(info.getLastLogonAt())) {
-            // Sin registro previo (null) o fecha sentinel (epoca): se trata como
-            // "primer inicio de sesion". No se puede distinguir con certeza un
-            // primer login real de un dato no disponible por otra razon; verificar
-            // con una cuenta real que nunca haya iniciado sesion.
-            model.addAttribute("firstLogin", true);
-        } else {
-            model.addAttribute("lastLogonFormatted",
-                    LAST_LOGON_FORMAT.format(info.getLastLogonAt().atZone(MX_ZONE)));
-        }
-
-        Integer days = info.getDaysUntilPasswordExpires();
+        Integer days = principal.getLoginInfo().getDaysUntilPasswordExpires();
         // Defensivo: si el valor viniera negativo (posible sentinel de "no aplica"),
-        // no se muestra el aviso. Verificar con una cuenta real que valores retorna
-        // ODUser.getNumDaysUntilPWExp() cuando la contrasena no expira.
+        // no se muestra el aviso.
         if (days != null && days >= 0 && days <= passwordExpiryProperties.getWarnDays()) {
             model.addAttribute("passwordExpiringInDays", days);
         }
-    }
-
-    /** null, o fecha sentinel tipica de "sin registro previo" (epoca UNIX). */
-    private boolean isFirstLogin(java.time.Instant lastLogonAt) {
-        return lastLogonAt == null || lastLogonAt.isBefore(java.time.Instant.parse("1980-01-01T00:00:00Z"));
     }
 }

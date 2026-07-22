@@ -113,10 +113,47 @@ html, body {
 }
 .record-strip .rv { color: var(--app-signal); }
 
-/* Encabezado superior de pantallas internas */
+/* Logo (SVG) de la marca */
+.brand-logo { flex: none; display: block; }
+
+/* Encabezado superior de pantallas internas: marca | datos de sesion + cerrar sesion */
 .app-header {
     background: var(--app-surface);
     border-bottom: 1px solid var(--app-line);
+}
+.app-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.app-header__session {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    text-align: right;
+}
+.app-header__top { display: flex; align-items: center; gap: 10px; }
+.app-header__welcome {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--app-ink);
+}
+/* separador visual entre la bienvenida y "cerrar sesion" */
+.app-header__logout { padding-left: 10px; border-left: 1px solid var(--app-line); }
+.app-header__conn {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .02em;
+    color: var(--app-steel);
+}
+.app-header__conn .rv { color: var(--app-signal); }
+/* En movil se ocultan bienvenida y conexion para no saturar: queda logo + cerrar sesion */
+@media (max-width: 639.98px) {
+    .app-header__welcome, .app-header__conn { display: none; }
+    .app-header__logout { padding-left: 0; border-left: none; }
 }
 
 /* =========================================================================
@@ -132,21 +169,27 @@ html, body {
    Botones — tres variantes
    ========================================================================= */
 
-/* Primario: rojo sólido (Ingresar, Buscar) */
+/* Primario: contorno rojo en reposo → rojo sólido, texto blanco en hover/focus
+   (mismo lenguaje que el secundario, en rojo) */
 .btn-primary {
-    background-color: var(--app-signal);
-    color: #fff;
-    border: none;
+    background-color: transparent;
+    border: 1px solid var(--app-signal);
+    color: var(--app-signal);
     border-radius: 3px;
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: .02em;
     cursor: pointer;
-    transition: background-color .15s ease;
+    transition: background-color .14s ease, color .14s ease, border-color .14s ease;
 }
-.btn-primary:hover:not(:disabled) { background-color: var(--app-signal-dark); }
-.btn-primary:focus-visible { outline: 2px solid var(--app-signal-dark); outline-offset: 2px; }
-.btn-primary:disabled { opacity: .8; cursor: wait; }
+.btn-primary:hover:not(:disabled),
+.btn-primary:focus-visible {
+    background-color: var(--app-signal);
+    border-color: var(--app-signal);
+    color: #fff;
+    outline: none;
+}
+.btn-primary:disabled { opacity: .6; cursor: wait; }
 
 /* Secundario: contorno gris en reposo → negro sólido, texto blanco en hover/focus */
 .btn-secondary {
@@ -248,6 +291,43 @@ html, body {
     pointer-events: none;
 }
 .search-wrap input { padding-left: 30px; }
+
+/* --- Formulario de búsqueda de folder: un solo grid de 3 columnas ---
+   Movil (por defecto): bloque; cada campo se apila con separador inferior.
+   >=sm (640px): grid unico; cada fila usa display:contents para que sus 3 celdas
+   se alineen con las de las demas filas. Solo hay borde bajo los titulos de columna
+   (sin borde por fila), como se pidio. */
+.flabel { font-family: var(--font-display); font-size: 15px; font-weight: 500; }
+.search-grid__head { display: none; }
+.search-grid__row { padding: 14px 0; border-bottom: 1px solid var(--app-line); }
+.search-grid__row:last-child { border-bottom: none; }
+.search-grid__cell { margin-bottom: 8px; }
+.search-grid__cell:last-child { margin-bottom: 0; }
+
+@media (min-width: 640px) {
+    .search-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 12rem minmax(0, 1fr);
+    }
+    .search-grid__head {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--app-steel);
+        padding: 0 16px 10px 0;
+        border-bottom: 1px solid var(--app-line);
+    }
+    .search-grid__head--last { padding-right: 0; }
+    .search-grid__row { display: contents; }
+    .search-grid__cell {
+        padding: 16px 16px 16px 0;
+        margin-bottom: 0;
+        align-self: center;
+    }
+    .search-grid__cell--val { padding-right: 0; }
+}
 
 .field-error { color: var(--app-error); font-family: var(--font-body); }
 .text-secondary { color: var(--app-steel); }

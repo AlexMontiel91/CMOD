@@ -6,23 +6,7 @@
     <@ui.appHeader/>
 
     <main class="max-w-3xl mx-auto px-6 py-12">
-        <h1 class="h-display text-2xl"><@spring.message "home.welcome"/>, ${username!""}</h1>
-
-        <#if lastLogonFormatted?? || (firstLogin?? && firstLogin) || (loginInfo?? && loginInfo.failedLoginsSinceLastSuccess gt 0)>
-            <p class="meta mt-2">
-                <#if lastLogonFormatted??>
-                    <@spring.message "home.lastLogin.label"/> <span class="rv">${lastLogonFormatted}</span>
-                <#elseif firstLogin?? && firstLogin>
-                    <@spring.message "home.firstLogin"/>
-                </#if>
-                <#if loginInfo?? && loginInfo.failedLoginsSinceLastSuccess gt 0>
-                    <#if lastLogonFormatted?? || (firstLogin?? && firstLogin)>&nbsp;·&nbsp;</#if>
-                    <@spring.message "home.failedLogins.label"/> <span class="rv">${loginInfo.failedLoginsSinceLastSuccess}</span>
-                </#if>
-            </p>
-        </#if>
-
-        <p class="text-secondary text-sm mt-3 mb-9"><@spring.message "home.session.ok"/></p>
+        <h1 class="h-display text-2xl mb-8"><@spring.message "home.session.ok"/></h1>
 
         <#if passwordExpiringInDays??>
             <div class="alert alert-warning px-4 py-3 text-sm mb-6">
@@ -46,7 +30,7 @@
         </div>
 
         <#if folders?? && folders?size gt 0>
-            <div class="search-wrap max-w-sm mb-4">
+            <div class="search-wrap mb-4">
                 <span class="search-ic" aria-hidden="true">⌕</span>
                 <label for="folder-search" class="sr-only"><@spring.message "home.folders.search.label"/></label>
                 <input type="search" id="folder-search" autocomplete="off"

@@ -17,23 +17,52 @@
 <#-- Campo oculto CSRF (requiere spring.freemarker.expose-request-attributes=true) -->
 <#macro csrf><#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/></#if></#macro>
 
-<#-- Marca: cuadro rojo con iniciales + nombre. cls: clases extra (p. ej. margen). -->
+<#-- Marca: logo SVG + nombre. cls: clases extra (p. ej. margen).
+     El SVG es un placeholder (líneas apiladas ~ índice/archivo); reemplazar por el real. -->
 <#macro brand cls="">
     <div class="brand<#if cls?has_content> ${cls}</#if>">
-        <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
+        <svg class="brand-logo" width="28" height="28" viewBox="0 0 28 28" role="img" aria-label="<@spring.message "app.name"/>">
+            <rect width="28" height="28" rx="5" fill="#D81020"/>
+            <rect x="7" y="8" width="14" height="2.6" rx="1.3" fill="#fff"/>
+            <rect x="7" y="13" width="14" height="2.6" rx="1.3" fill="#fff"/>
+            <rect x="7" y="18" width="9" height="2.6" rx="1.3" fill="#fff"/>
+        </svg>
         <span><@spring.message "app.name"/></span>
     </div>
 </#macro>
 
-<#-- Encabezado de pantallas internas: marca + cerrar sesion. -->
+<#-- Encabezado de pantallas internas: marca a la izquierda; a la derecha bienvenida
+     + cerrar sesion, y debajo la ultima conexion + intentos fallidos. Los datos de
+     sesion (username, lastLogonFormatted/firstLogin, failedLogins) los expone
+     GlobalModelAttributes, disponibles en toda vista autenticada. -->
 <#macro appHeader>
     <header class="app-header">
-        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="app-header__inner max-w-3xl mx-auto px-6 py-3">
             <@brand/>
-            <form method="post" action="<@spring.url '/logout'/>">
-                <@csrf/>
-                <button type="submit" class="link"><@spring.message "home.logout"/></button>
-            </form>
+            <div class="app-header__session">
+                <div class="app-header__top">
+                    <#if username?? && username?has_content>
+                        <span class="app-header__welcome"><@spring.message "home.welcome"/>, ${username}</span>
+                    </#if>
+                    <form method="post" action="<@spring.url '/logout'/>">
+                        <@csrf/>
+                        <button type="submit" class="link app-header__logout"><@spring.message "home.logout"/></button>
+                    </form>
+                </div>
+                <#if lastLogonFormatted?? || (firstLogin?? && firstLogin) || failedLogins??>
+                    <div class="app-header__conn">
+                        <#if lastLogonFormatted??>
+                            <@spring.message "home.lastLogin.label"/> <span class="rv">${lastLogonFormatted}</span>
+                        <#elseif firstLogin?? && firstLogin>
+                            <@spring.message "home.firstLogin"/>
+                        </#if>
+                        <#if failedLogins??>
+                            <#if lastLogonFormatted?? || (firstLogin?? && firstLogin)> · </#if>
+                            <@spring.message "home.failedLogins.label"/> <span class="rv">${failedLogins}</span>
+                        </#if>
+                    </div>
+                </#if>
+            </div>
         </div>
     </header>
 </#macro>

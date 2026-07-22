@@ -1,10 +1,14 @@
 package com.app.icncards.infrastructure.odwek.adapter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.stereotype.Repository;
 
@@ -132,6 +136,17 @@ public class CmodFolderRepository implements FolderRepository {
                 ? criteria.getDefaultFmt()
                 : null;
 
+        // Los inputs HTML type=date / datetime-local SOLO aceptan ISO (yyyy-MM-dd /
+        // yyyy-MM-ddTHH:mm). Los valores por defecto de OnDemand vienen en el formato
+        // del folder (dateFormat), asi que hay que convertirlos a ISO o el navegador
+        // los ignora y el campo aparece vacio. Ante cualquier fallo se deja el valor
+        // original (mismo comportamiento que antes: campo vacio, sin romper).
+        if (kind == SearchFieldKind.DATE || kind == SearchFieldKind.DATETIME) {
+            boolean withTime = (kind == SearchFieldKind.DATETIME);
+            defaultValue1 = toIsoDefault(defaultValue1, dateFormat, withTime);
+            defaultValue2 = toIsoDefault(defaultValue2, dateFormat, withTime);
+        }
+
         return new SearchFieldDefinition(
                 criteria.getName(),
                 criteria.getDescription(),
@@ -144,5 +159,63 @@ public class CmodFolderRepository implements FolderRepository {
                 choiceValues,
                 criteria.getMaxEntryChars(),
                 dateFormat);
+    }
+
+    /**
+     * Convierte un valor por defecto de fecha desde el formato de OnDemand (strftime,
+     * p. ej. "%m/%d/%y") al ISO que exigen los inputs HTML (yyyy-MM-dd para date;
+     * yyyy-MM-ddTHH:mm para datetime-local). Si no se puede parsear (formato no
+     * reconocido, valor vacio, etc.) devuelve el valor original: el campo quedara
+     * vacio como antes, sin romper el render.
+     */
+    private static String toIsoDefault(String raw, String odFormat, boolean withTime) {
+        if (raw == null || raw.trim().isEmpty() || odFormat == null || odFormat.isEmpty()) {
+            return raw;
+        }
+        try {
+            DateTimeFormatter parser = DateTimeFormatter.ofPattern(strftimeToJava(odFormat), Locale.ROOT);
+            if (withTime) {
+                return LocalDateTime.parse(raw.trim(), parser)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+            }
+            return LocalDate.parse(raw.trim(), parser).toString(); // ISO yyyy-MM-dd
+        } catch (Exception e) {
+            return raw;
+        }
+    }
+
+    /** Traduce los especificadores strftime mas comunes al patron de DateTimeFormatter. */
+    private static String strftimeToJava(String f) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < f.length(); i++) {
+            char c = f.charAt(i);
+            if (c == '%' && i + 1 < f.length()) {
+                char n = f.charAt(++i);
+                switch (n) {
+                    case 'Y': sb.append("yyyy"); break;
+                    case 'y': sb.append("yy");   break;
+                    case 'm': sb.append("MM");   break;
+                    case 'd': sb.append("dd");   break;
+                    case 'e': sb.append("d");    break;
+                    case 'H': sb.append("HH");   break;
+                    case 'I': sb.append("hh");   break;
+                    case 'M': sb.append("mm");   break;
+                    case 'S': sb.append("ss");   break;
+                    case 'p': sb.append("a");    break;
+                    case 'j': sb.append("DDD");  break;
+                    case 'b': sb.append("MMM");  break;
+                    case 'B': sb.append("MMMM"); break;
+                    case 'a': sb.append("EEE");  break;
+                    case 'A': sb.append("EEEE"); break;
+                    case '%': sb.append('%');    break;
+                    default:  sb.append(n);      break; // desconocido: literal
+                }
+            } else if (Character.isLetter(c)) {
+                sb.append('\'').append(c).append('\''); // literal a escapar en el patron Java
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }
