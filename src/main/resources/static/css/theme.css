@@ -135,14 +135,16 @@ html, body {
     text-align: right;
 }
 .app-header__top { display: flex; align-items: center; gap: 10px; }
+.app-header__top form { display: flex; align-items: center; margin: 0; }
 .app-header__welcome {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 13px;
     color: var(--app-ink);
+    line-height: 1;
 }
-/* separador visual entre la bienvenida y "cerrar sesion" */
-.app-header__logout { padding-left: 10px; border-left: 1px solid var(--app-line); }
+/* separador vertical "|" entre la bienvenida y "cerrar sesion" */
+.app-header__sep { flex: none; width: 1px; height: 14px; background: rgba(90, 100, 114, .35); }
 .app-header__conn {
     font-family: var(--font-mono);
     font-size: 10.5px;
@@ -150,10 +152,9 @@ html, body {
     color: var(--app-steel);
 }
 .app-header__conn .rv { color: var(--app-signal); }
-/* En movil se ocultan bienvenida y conexion para no saturar: queda logo + cerrar sesion */
+/* En movil se ocultan bienvenida, separador y conexion: queda logo + cerrar sesion */
 @media (max-width: 639.98px) {
-    .app-header__welcome, .app-header__conn { display: none; }
-    .app-header__logout { padding-left: 0; border-left: none; }
+    .app-header__welcome, .app-header__sep, .app-header__conn { display: none; }
 }
 
 /* =========================================================================
@@ -412,6 +413,42 @@ html, body {
 .alert-warning { background-color: var(--app-warning-tint); border-color: var(--app-warning); color: var(--app-warning-text); }
 .alert-success { background-color: var(--app-success-tint); border-color: var(--app-success); color: var(--app-success); }
 .alert-info    { background-color: var(--app-info-tint);    border-color: var(--app-info);    color: var(--app-info); }
+
+/* =========================================================================
+   Overlay "Cargando…" (al abrir un folder; la consulta a OnDemand puede tardar)
+   ========================================================================= */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(21, 23, 28, .55);
+}
+.loading-overlay__box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: 4px;
+    padding: 16px 22px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .04em;
+    color: var(--app-ink);
+}
+.loading-overlay__spinner {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--app-line);
+    border-top-color: var(--app-signal);
+    border-radius: 50%;
+    animation: loading-spin .7s linear infinite;
+}
+@keyframes loading-spin { to { transform: rotate(360deg); } }
 
 /* =========================================================================
    Accesibilidad

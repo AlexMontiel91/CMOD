@@ -43,10 +43,11 @@
                 <div class="app-header__top">
                     <#if username?? && username?has_content>
                         <span class="app-header__welcome"><@spring.message "home.welcome"/>, ${username}</span>
+                        <span class="app-header__sep" aria-hidden="true"></span>
                     </#if>
                     <form method="post" action="<@spring.url '/logout'/>">
                         <@csrf/>
-                        <button type="submit" class="link app-header__logout"><@spring.message "home.logout"/></button>
+                        <button type="submit" class="link"><@spring.message "home.logout"/></button>
                     </form>
                 </div>
                 <#if lastLogonFormatted?? || (firstLogin?? && firstLogin) || failedLogins??>

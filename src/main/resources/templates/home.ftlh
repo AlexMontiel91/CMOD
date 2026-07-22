@@ -41,7 +41,8 @@
             <div id="folder-table-wrapper"
                  class="folder-index"
                  data-page-size="10"
-                 data-info-template="<@spring.message "home.folders.pagination.info"/>">
+                 data-info-template="<@spring.message "home.folders.pagination.info"/>"
+                 data-loading-text="<@spring.message "home.folders.loading"/>">
                 <div id="folder-table-body">
                     <#list folders as folder>
                         <a class="idxrow" href="<@spring.url '/folder/${folder.name?url}'/>"
