@@ -187,6 +187,16 @@ Casos borde: en `theme.css` (estático, la macro no aplica) las fuentes usan **r
 necesita ubicar un form, que lo haga por `id`/`btn.form`, **no** por `form[action="/ruta"]`
 (quedaría acoplado a la ruta literal que ahora genera la macro).
 
+### Overlay "Cargando…" al abrir un folder
+
+Abrir un folder (clic en una fila de la lista) navega a `/folder/{n}`, lo que dispara una consulta
+a OnDemand que en **dev puede tardar** (en prod es rápida). Para que el usuario sepa que su solicitud
+se está procesando, `folder-table.js` muestra un overlay a pantalla completa (`.loading-overlay` en
+`theme.css`, con spinner) al hacer clic en una fila; se retira solo cuando carga la nueva página. El
+texto viene de `messages.properties` (`home.folders.loading`) vía `data-loading-text` en
+`#folder-table-wrapper`. Respeta abrir en pestaña nueva (no se muestra con ctrl/cmd/shift ni con clic
+no primario). Es progressive enhancement: sin JS, la navegación funciona igual, solo sin el aviso.
+
 `infrastructure/**/devtest/` (p. ej. `OdwekConnectionTestRunner`,
 `SessionCredentialDebugController`) son ayudantes solo de diagnóstico — no los cables en
 flujos de producción.
