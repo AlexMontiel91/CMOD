@@ -10,7 +10,9 @@
  * Requiere en la pagina:
  *   - #folder-table-wrapper con data-page-size y data-info-template
  *       (el template usa los tokens literales {from} {to} {total})
- *   - #folder-table-body con filas <tr data-search="texto en minusculas">
+ *   - #folder-table-body con filas (cualquier elemento) con
+ *       data-search="texto en minusculas". Cada fila puede incluir un
+ *       elemento .idxn cuyo texto se renumera a la posicion visible.
  *   - #folder-no-results (fila a mostrar cuando el filtro no encuentra nada)
  *   - #folder-search (input de texto, opcional)
  *   - #folder-prev / #folder-next / #folder-pagination-info (opcionales)
@@ -26,6 +28,10 @@
             .toLowerCase();
     }
 
+    function pad2(n) {
+        return (n < 10 ? '0' : '') + n;
+    }
+
     function initFolderTable() {
         var wrapper = document.getElementById('folder-table-wrapper');
         var body = document.getElementById('folder-table-body');
@@ -36,7 +42,7 @@
         var pageSize = parseInt(wrapper.getAttribute('data-page-size'), 10) || 10;
         var infoTemplate = wrapper.getAttribute('data-info-template') || 'Mostrando {from}\u2013{to} de {total}';
 
-        var allRows = Array.prototype.slice.call(body.querySelectorAll('tr[data-search]'));
+        var allRows = Array.prototype.slice.call(body.querySelectorAll('[data-search]'));
         var noResultsRow = document.getElementById('folder-no-results');
         var searchInput = document.getElementById('folder-search');
         var infoEl = document.getElementById('folder-pagination-info');
@@ -68,8 +74,14 @@
             });
 
             var start = (page - 1) * pageSize;
-            rows.slice(start, start + pageSize).forEach(function (row) {
+            rows.slice(start, start + pageSize).forEach(function (row, i) {
                 row.classList.remove('hidden');
+                // renumera la fila visible a su posicion en el listado (coincide
+                // con "Mostrando X-Y de Z"); si no hay .idxn, no-op
+                var numEl = row.querySelector('.idxn');
+                if (numEl) {
+                    numEl.textContent = pad2(start + i + 1);
+                }
             });
 
             if (noResultsRow) {

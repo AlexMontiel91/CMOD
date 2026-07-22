@@ -9,55 +9,56 @@
     <link rel="stylesheet" href="/css/theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center px-4">
+<body class="min-h-screen flex items-center justify-center px-4 py-10">
 
     <div class="w-full max-w-md">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="accent-bar h-1.5"></div>
+        <div class="surface overflow-hidden">
+            <div class="record-strip">
+                <span>SIST <span class="rv">ICN·CMOD</span></span>
+                <span>SESIÓN <span class="rv">—</span></span>
+            </div>
 
             <div class="p-8 sm:p-10">
-                <div class="mb-8">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
-                         style="background-color: var(--app-red);">
-                        <span class="text-white font-bold text-lg"><@spring.message "app.logoInitials"/></span>
+                <div class="mb-7">
+                    <div class="brand mb-5">
+                        <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
+                        <span><@spring.message "app.name"/></span>
                     </div>
-                    <h1 class="text-2xl font-bold tracking-tight" style="color: var(--app-black);">
-                        <@spring.message "login.title"/>
-                    </h1>
-                    <p class="text-sm text-secondary mt-1"><@spring.message "login.subtitle"/></p>
+                    <h1 class="h-display text-2xl"><@spring.message "login.title"/></h1>
+                    <p class="meta mt-2">&gt; <@spring.message "login.subtitle"/></p>
                 </div>
 
                 <#-- Mensaje de logout (success) -->
                 <#if logout?? && logout>
-                    <div class="alert-success mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-success mb-5 px-4 py-3 text-sm">
                         <@spring.message "login.logout.success"/>
                     </div>
                 </#if>
 
                 <#-- Password cambiado exitosamente (success) -->
                 <#if passwordChanged?? && passwordChanged>
-                    <div class="alert-success mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-success mb-5 px-4 py-3 text-sm">
                         <@spring.message "login.password.changed"/>
                     </div>
                 </#if>
 
                 <#-- Sesion expirada / credencial ya no valida (warning) -->
                 <#if expired?? && expired>
-                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-warning mb-5 px-4 py-3 text-sm">
                         <@spring.message "login.session.expired"/>
                     </div>
                 </#if>
 
                 <#-- Logout por inactividad (warning) -->
                 <#if idle?? && idle>
-                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-warning mb-5 px-4 py-3 text-sm">
                         <@spring.message "login.session.idle"/>
                     </div>
                 </#if>
 
                 <#-- Acceso denegado / CSRF invalido (warning) -->
                 <#if denied?? && denied>
-                    <div class="alert-warning mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-warning mb-5 px-4 py-3 text-sm">
                         <@spring.message "login.access.denied"/>
                     </div>
                 </#if>
@@ -65,7 +66,7 @@
                 <#-- Errores globales (credenciales, bloqueo, servicio) -->
                 <@spring.bind "loginForm"/>
                 <#if spring.status.errorMessages?size gt 0>
-                    <div class="alert-error mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-error mb-5 px-4 py-3 text-sm">
                         <#list spring.status.errorMessages as msg>
                             <div>${msg}</div>
                         </#list>
@@ -80,14 +81,12 @@
 
                     <#-- Usuario -->
                     <div>
-                        <label for="username" class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
-                            <@spring.message "login.username.label"/>
-                        </label>
+                        <label for="username" class="app-label"><@spring.message "login.username.label"/></label>
                         <@spring.bind "loginForm.username"/>
                         <input type="text" id="username" name="username"
                                value="${spring.status.value!''}"
                                autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
-                               class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm
+                               class="input-app w-full px-3.5 py-2.5 text-sm
                                       <#if spring.status.errorMessages?size gt 0>has-error</#if>"/>
                         <#list spring.status.errorMessages as msg>
                             <p class="field-error mt-1.5 text-xs">${msg}</p>
@@ -96,13 +95,11 @@
 
                     <#-- Contrasena (NUNCA se re-renderiza el value) -->
                     <div>
-                        <label for="password" class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
-                            <@spring.message "login.password.label"/>
-                        </label>
+                        <label for="password" class="app-label"><@spring.message "login.password.label"/></label>
                         <@spring.bind "loginForm.password"/>
                         <input type="password" id="password" name="password"
                                autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                               class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm
+                               class="input-app w-full px-3.5 py-2.5 text-sm
                                       <#if spring.status.errorMessages?size gt 0>has-error</#if>"/>
                         <#list spring.status.errorMessages as msg>
                             <p class="field-error mt-1.5 text-xs">${msg}</p>
@@ -111,7 +108,7 @@
 
                     <button type="submit" id="login-submit-btn"
                             data-loading-text="<@spring.message "login.submitting"/>"
-                            class="btn-primary w-full rounded-lg text-sm font-medium py-3 mt-2 flex items-center justify-center gap-2">
+                            class="btn-primary w-full text-sm py-3 mt-2 flex items-center justify-center gap-2">
                         <svg id="login-spinner" class="hidden animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                              fill="none" viewBox="0 0 24 24" aria-hidden="true">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -123,7 +120,7 @@
             </div>
         </div>
 
-        <p class="text-center text-xs text-secondary mt-6"><@spring.message "app.footer"/></p>
+        <p class="meta text-center mt-6"><@spring.message "app.footer"/></p>
     </div>
 
     <script src="/js/login-submit.js"></script>

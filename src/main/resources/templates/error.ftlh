@@ -8,24 +8,22 @@
     <link rel="stylesheet" href="/css/theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center px-4">
+<body class="min-h-screen flex items-center justify-center px-4 py-10">
 
     <div class="w-full max-w-md">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="accent-bar h-1.5"></div>
+        <div class="surface overflow-hidden">
+            <div class="record-strip">
+                <span>SIST <span class="rv">ICN·CMOD</span></span>
+                <span>ESTADO <span class="rv">ERROR</span></span>
+            </div>
             <div class="p-8 sm:p-10 text-center">
-                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4 mx-auto"
-                     style="background-color: var(--app-red);">
-                    <span class="text-white font-bold text-lg">!</span>
-                </div>
-                <h1 class="text-xl font-bold tracking-tight mb-2" style="color: var(--app-black);">
-                    <@spring.message "error.title"/>
-                </h1>
-                <p class="text-sm text-secondary mb-6">
+                <div class="brand-mark mx-auto mb-5" style="width:44px;height:44px;font-size:20px;">!</div>
+                <h1 class="h-display text-xl mb-2"><@spring.message "error.title"/></h1>
+                <p class="text-sm text-secondary mb-7">
                     <#-- messageCode viene del GlobalExceptionHandler; nunca se muestra el detalle tecnico -->
                     <@spring.message (messageCode!"error.unexpected")/>
                 </p>
-                <a href="/" class="btn-primary inline-block rounded-lg text-sm font-medium px-6 py-2.5">
+                <a href="/" class="btn-primary inline-block text-sm px-6 py-2.5">
                     <@spring.message "error.back"/>
                 </a>
             </div>

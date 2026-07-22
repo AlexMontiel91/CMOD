@@ -1,133 +1,339 @@
 /* ===========================================================================
-   Tema corporativo IMSS — estilo FINTECH MODERNA
+   Tema ICN — dirección "Sistema"
    ---------------------------------------------------------------------------
-   Fuente: la que trae Tailwind por defecto (system font stack). No se declara
-   font-family propia a proposito.
+   Herencia del mainframe (z/OS + CMOD) hecha precisa y contemporánea:
+   tinta y papel, grotesca Archivo para títulos, monoespaciada para todo dato
+   (folios, códigos, metadatos). Los .ftlh combinan utilidades de Tailwind
+   (layout) con las clases de componente de este archivo (identidad).
+
+   Fuentes auto-alojadas en /fonts (la CSP permite same-origin 'self'); no se
+   usan CDNs de fuentes.
    =========================================================================== */
 
+@font-face {
+    font-family: "Archivo";
+    src: url("/fonts/archivo-600.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Archivo";
+    src: url("/fonts/archivo-700.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
-    /* --- Marca --- */
-    --app-red: #DB0011;          /* primario */
-    --app-black: #000000;        /* secundario */
-    --app-white: #FFFFFF;
+    /* --- Neutros y marca (dirección Sistema) --- */
+    --app-ink:        #15171C;   /* tinta: texto principal, superficies oscuras */
+    --app-ink-soft:   #2B2E35;   /* tinta suave: texto secundario fuerte */
+    --app-paper:      #F4F5F2;   /* papel: fondo de la app */
+    --app-surface:    #FFFFFF;   /* superficie de tarjetas/tablas */
+    --app-signal:     #D81020;   /* rojo señal: acción primaria y foco */
+    --app-signal-dark:#B40D1B;   /* rojo señal en hover */
+    --app-steel:      #5A6472;   /* acero: texto secundario, contorno secundario */
+    --app-line:       #DDE0DA;   /* reglas y bordes */
+    --app-ledger:     #ECEEEA;   /* tinte de fila / superficie tenue */
 
-    /* --- Fondos y superficies --- */
-    --app-light-pearl: #F3F3F3;  /* fondos */
-    --app-pearl: #EDEDED;
-    --app-silver: #D7D8D6;       /* borders de cards/tablas */
+    /* --- Semánticos: error --- */
+    --app-error:      #A8000B;
+    --app-error-tint: #F9F2F3;
+    /* --- Semánticos: warning --- */
+    --app-warning:      #C77A00;
+    --app-warning-text: #7A4E00;
+    --app-warning-tint: #FFF6E6;
+    /* --- Semánticos: success --- */
+    --app-success:      #00847F;
+    --app-success-tint: #E5F2F2;
+    /* --- Semánticos: info --- */
+    --app-info:      #305A85;
+    --app-info-tint: #EBEFF4;
 
-    /* --- Texto --- */
-    --app-pewter: #767676;       /* texto secundario */
-    --app-charcoal: #333333;     /* texto general */
-
-    /* --- Semanticos: error --- */
-    --app-red-error: #A8000B;
-    --app-red-error-tint: #F9F2F3;
-
-    /* --- Semanticos: warning --- */
-    --app-amber: #FFBB33;
-    --app-amber-tint: #FFF8EA;
-
-    /* --- Semanticos: success --- */
-    --app-green: #00847F;
-    --app-green-tint: #E5F2F2;
-
-    /* --- Semanticos: info --- */
-    --app-blue: #305A85;
-    --app-blue-tint: #EBEFF4;
+    /* --- Tipografía --- */
+    --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono:    ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
 }
 
 html, body {
-    background-color: var(--app-light-pearl);
-    color: var(--app-charcoal);
+    background-color: var(--app-paper);
+    color: var(--app-ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Botón primario corporativo */
+/* Títulos display (grotesca Archivo) */
+.h-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: var(--app-ink);
+}
+
+/* =========================================================================
+   Marca y tira de registro (herencia mainframe)
+   ========================================================================= */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .02em;
+    color: var(--app-ink);
+}
+.brand-mark {
+    width: 26px; height: 26px; flex: none;
+    background: var(--app-signal);
+    color: #fff;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: .02em;
+}
+
+/* Tira negra monoespaciada del tope de la tarjeta de acceso */
+.record-strip {
+    background: var(--app-ink);
+    color: #E9EAE6;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .03em;
+    padding: 9px 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+.record-strip .rv { color: var(--app-signal); }
+
+/* Encabezado superior de pantallas internas */
+.app-header {
+    background: var(--app-surface);
+    border-bottom: 1px solid var(--app-line);
+}
+
+/* =========================================================================
+   Superficies
+   ========================================================================= */
+.surface {
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: 4px;
+}
+
+/* =========================================================================
+   Botones — tres variantes
+   ========================================================================= */
+
+/* Primario: rojo sólido (Ingresar, Buscar) */
 .btn-primary {
-    background-color: var(--app-red);
-    color: var(--app-white);
+    background-color: var(--app-signal);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: .02em;
+    cursor: pointer;
     transition: background-color .15s ease;
 }
-.btn-primary:hover { background-color: var(--app-red-error); }
-.btn-primary:focus-visible { outline: 2px solid var(--app-red-error); outline-offset: 2px; }
-.btn-primary:disabled {
-    opacity: .8;
-    cursor: wait;
-}
+.btn-primary:hover:not(:disabled) { background-color: var(--app-signal-dark); }
+.btn-primary:focus-visible { outline: 2px solid var(--app-signal-dark); outline-offset: 2px; }
+.btn-primary:disabled { opacity: .8; cursor: wait; }
 
-/* Boton secundario (p. ej. "Limpiar formulario"): menos peso visual que el primario rojo */
+/* Secundario: contorno gris en reposo → negro sólido, texto blanco en hover/focus */
 .btn-secondary {
     background-color: transparent;
-    border: 1px solid var(--app-black);
-    color: var(--app-black);
-    transition: background-color .15s ease;
+    border: 1px solid var(--app-steel);
+    color: var(--app-steel);
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease, border-color .14s ease;
 }
-.btn-secondary:hover:not(:disabled) {
-    background-color: var(--app-light-pearl);
+.btn-secondary:hover:not(:disabled),
+.btn-secondary:focus-visible {
+    background-color: var(--app-ink);
+    border-color: var(--app-ink);
+    color: #fff;
+    outline: none;
 }
-.btn-secondary:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-    pointer-events: none;
-}
+.btn-secondary:disabled { opacity: .5; cursor: not-allowed; pointer-events: none; }
 
-/* Barra de acento superior de la tarjeta */
-.accent-bar {
-    background: linear-gradient(90deg, var(--app-red) 0%, var(--app-red-error) 100%);
+/* Paginación: compacto en mono, misma lógica gris → negro que el secundario */
+.btn-pager {
+    background-color: transparent;
+    border: 1px solid var(--app-steel);
+    color: var(--app-steel);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease, border-color .14s ease;
 }
+.btn-pager:hover:not(:disabled) {
+    background-color: var(--app-ink);
+    border-color: var(--app-ink);
+    color: #fff;
+}
+.btn-pager:disabled { opacity: .35; cursor: default; pointer-events: none; }
 
-/* Foco de inputs en rojo corporativo */
+/* =========================================================================
+   Enlace de texto del sistema (cerrar sesión, cambiar contraseña, volver…)
+   ========================================================================= */
+.link {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--app-steel);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color .14s ease;
+}
+.link:hover, .link:focus-visible { color: var(--app-signal); outline: none; }
+.link:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+
+/* =========================================================================
+   Formularios
+   ========================================================================= */
+.app-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--app-steel);
+    margin-bottom: 5px;
+}
 .input-app {
-    border-color: var(--app-silver);
-    color: var(--app-charcoal);
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: 3px;
+    color: var(--app-ink);
+    font-family: var(--font-mono);
+    transition: border-color .14s ease, box-shadow .14s ease;
 }
+.input-app::placeholder { color: #9AA0A8; }
 .input-app:focus {
     outline: none;
-    border-color: var(--app-red);
-    box-shadow: 0 0 0 3px rgba(219, 0, 17, .15);
+    border-color: var(--app-signal);
+    box-shadow: 0 0 0 3px rgba(216, 16, 32, .14);
 }
-.input-app.has-error {
-    border-color: var(--app-red-error);
-}
+.input-app.has-error { border-color: var(--app-error); }
 
-/* --- Alertas semanticas (usar junto a las clases de Tailwind de layout) --- */
-.alert-error {
-    background-color: var(--app-red-error-tint);
-    border: 1px solid var(--app-red-error);
-    color: var(--app-red-error);
-}
-.alert-warning {
-    background-color: var(--app-amber-tint);
-    border: 1px solid var(--app-amber);
-    color: #8a6100; /* variante oscura del amber para contraste de texto (AA) */
-}
-.alert-success {
-    background-color: var(--app-green-tint);
-    border: 1px solid var(--app-green);
-    color: var(--app-green);
-}
-.alert-info {
-    background-color: var(--app-blue-tint);
-    border: 1px solid var(--app-blue);
-    color: var(--app-blue);
-}
-
-/* Texto de error bajo un campo de formulario */
-.field-error {
-    color: var(--app-red-error);
-}
-
-/* Texto secundario / ayuda */
-.text-secondary {
-    color: var(--app-pewter);
-}
-
-/* Botones de paginacion (tabla de folders) */
-#folder-prev:hover:not(:disabled),
-#folder-next:hover:not(:disabled) {
-    background-color: var(--app-light-pearl);
-}
-#folder-prev:disabled,
-#folder-next:disabled {
+/* Buscador con icono (lista de folders) */
+.search-wrap { position: relative; }
+.search-wrap .search-ic {
+    position: absolute; left: 11px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--app-steel);
+    font-family: var(--font-mono);
+    font-size: 13px;
     pointer-events: none;
+}
+.search-wrap input { padding-left: 30px; }
+
+.field-error { color: var(--app-error); font-family: var(--font-body); }
+.text-secondary { color: var(--app-steel); }
+
+/* Etiqueta de sección en mono (p. ej. "Folders asignados") */
+.sec-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--app-steel);
+    font-weight: 400;
+    margin: 0;
+}
+
+/* Línea de metadatos en mono (última conexión, intentos, folio…) */
+.meta {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .02em;
+    color: var(--app-steel);
+}
+.meta .rv { color: var(--app-signal); }
+
+/* =========================================================================
+   Lista de folders como índice (distribución: nº · nombre/desc · chevron)
+   ========================================================================= */
+.folder-index {
+    border: 1px solid var(--app-line);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--app-surface);
+}
+.idxrow {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 15px;
+    border-top: 1px solid var(--app-line);
+    background: var(--app-surface);
+    text-decoration: none;
+    color: inherit;
+    transition: background-color .14s ease;
+}
+.idxrow:first-child { border-top: none; }
+.idxrow:hover { background: var(--app-ledger); }
+.idxrow:focus-visible { outline: 2px solid var(--app-signal); outline-offset: -2px; }
+.idxn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--app-signal);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .02em;
+}
+.fname {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -.01em;
+    color: var(--app-ink);
+    text-underline-offset: 2px;
+}
+.idxrow:hover .fname { text-decoration: underline; }
+.fdesc { font-family: var(--font-body); font-size: 11.5px; color: var(--app-steel); }
+.fcode { font-family: var(--font-mono); font-size: 10.5px; color: var(--app-ink-soft); }
+.chev { font-family: var(--font-mono); color: #B8BCC2; font-size: 13px; transition: color .14s ease; }
+.idxrow:hover .chev { color: var(--app-signal); }
+
+.pager-info {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--app-steel);
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================================
+   Alertas semánticas (radio angular, coherente con la dirección)
+   ========================================================================= */
+.alert { border-radius: 3px; border: 1px solid; }
+.alert-error   { background-color: var(--app-error-tint);   border-color: var(--app-error);   color: var(--app-error); }
+.alert-warning { background-color: var(--app-warning-tint); border-color: var(--app-warning); color: var(--app-warning-text); }
+.alert-success { background-color: var(--app-success-tint); border-color: var(--app-success); color: var(--app-success); }
+.alert-info    { background-color: var(--app-info-tint);    border-color: var(--app-info);    color: var(--app-info); }
+
+/* =========================================================================
+   Accesibilidad
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
 }

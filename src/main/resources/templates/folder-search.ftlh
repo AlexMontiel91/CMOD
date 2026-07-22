@@ -1,53 +1,54 @@
 <#import "/spring.ftl" as spring/>
+<#-- Titulo = nombre del folder (ODFolder.getName, fiable); subtitulo = descripcion
+     (getDescription, puede venir vacia). Se blindan con ?has_content porque el operador
+     ! de FreeMarker NO cae al alterno con cadena vacia "", solo con null. -->
+<#assign folderTitle = (definition.folderName)!''>
+<#if !folderTitle?has_content><#assign folderTitle = (definition.folderDescription)!''></#if>
+<#assign folderDesc = (definition.folderDescription)!''>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${definition.folderDescription!definition.folderName} — <@spring.message "app.name"/></title>
+    <title>${folderTitle} — <@spring.message "app.name"/></title>
     <link rel="stylesheet" href="/css/theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen" data-idle-timeout-minutes="${idleTimeoutMinutes!0}">
 
-    <header class="bg-white border-b" style="border-color: var(--app-silver);">
+    <header class="app-header">
         <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                     style="background-color: var(--app-red);">
-                    <span class="text-white font-bold text-xs"><@spring.message "app.logoInitials"/></span>
-                </div>
-                <span class="font-semibold" style="color: var(--app-black);"><@spring.message "app.name"/></span>
+            <div class="brand">
+                <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
+                <span><@spring.message "app.name"/></span>
             </div>
             <form method="post" action="/logout">
                 <#if _csrf??>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 </#if>
-                <button type="submit" class="text-sm text-secondary hover:opacity-80 transition">
-                    <@spring.message "home.logout"/>
-                </button>
+                <button type="submit" class="link"><@spring.message "home.logout"/></button>
             </form>
         </div>
     </header>
 
     <main class="max-w-3xl mx-auto px-6 py-10">
-        <a href="/" class="text-sm hover:underline" style="color: var(--app-red);">
-            &larr; <@spring.message "folder.search.back"/>
-        </a>
+        <a href="/" class="link">&larr; <@spring.message "folder.search.back"/></a>
 
-        <h1 class="text-2xl font-bold tracking-tight mt-3" style="color: var(--app-black);">
-            ${definition.folderDescription!definition.folderName}
-        </h1>
-        <p class="text-secondary text-sm mb-8">${definition.folderName}</p>
+        <h1 class="h-display text-2xl mt-4">${folderTitle}</h1>
+        <#if folderDesc?has_content && folderDesc != folderTitle>
+            <p class="text-secondary text-sm mt-1 mb-8">${folderDesc}</p>
+        <#else>
+            <div class="mb-8"></div>
+        </#if>
 
         <#if submitted?? && submitted>
-            <div class="alert-info rounded-lg px-4 py-3 text-sm mb-6">
+            <div class="alert alert-info px-4 py-3 text-sm mb-6">
                 <@spring.message "folder.search.submitted.info"/>
             </div>
         </#if>
 
         <#if definition.fields?size == 0>
-            <div class="alert-info rounded-lg px-4 py-3 text-sm">
+            <div class="alert alert-info px-4 py-3 text-sm">
                 <@spring.message "folder.search.empty"/>
             </div>
         <#else>
@@ -68,8 +69,7 @@
             <form id="folder-search-form" method="post"
                   action="/folder/${definition.folderName?url}/search"
                   data-two-value-operators="${twoValueOperators!''}"
-                  class="bg-white rounded-2xl shadow-sm border p-6 sm:p-8"
-                  style="border-color: var(--app-silver);">
+                  class="surface p-6 sm:p-8">
 
                 <#if _csrf??>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -77,14 +77,14 @@
 
                 <#-- Encabezado tipo tabla (solo visible en pantallas >= sm) -->
                 <div class="hidden sm:grid sm:grid-cols-[1fr_11rem_1fr] gap-4 pb-3 mb-1 border-b"
-                     style="border-color: var(--app-silver);">
-                    <span class="text-xs font-medium uppercase tracking-wide text-secondary">
+                     style="border-color: var(--app-line);">
+                    <span class="app-label" style="margin-bottom:0;">
                         <@spring.message "folder.search.column.field"/>
                     </span>
-                    <span class="text-xs font-medium uppercase tracking-wide text-secondary">
+                    <span class="app-label" style="margin-bottom:0;">
                         <@spring.message "folder.search.column.operator"/>
                     </span>
-                    <span class="text-xs font-medium uppercase tracking-wide text-secondary">
+                    <span class="app-label" style="margin-bottom:0;">
                         <@spring.message "folder.search.column.value"/>
                     </span>
                 </div>
@@ -103,20 +103,27 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-[1fr_11rem_1fr] gap-2 sm:gap-4 items-start
                                 py-4 border-b last:border-0"
-                         style="border-color: var(--app-silver);"
+                         style="border-color: var(--app-line);"
                          data-field-kind="${field.kind.name()}">
 
-                        <#-- Columna 1: nombre del campo -->
-                        <label class="text-sm font-medium sm:pt-2" style="color: var(--app-charcoal);">
-                            ${field.description!field.name}
-                            <#if field.required><span style="color: var(--app-red-error);"> *</span></#if>
+                        <#-- Columna 1: nombre del campo.
+                             ODCriteria.getName() (nombre del criterio) es el rotulo fiable;
+                             getDescription() suele venir vacio. OJO: el operador ! de FreeMarker
+                             NO cae al alterno con cadena vacia "", solo con null -> por eso el
+                             rotulo se elige explicitamente con ?has_content (name, y si viniera
+                             vacio, description). -->
+                        <#assign fieldLabel = (field.name)!''>
+                        <#if !fieldLabel?has_content><#assign fieldLabel = (field.description)!''></#if>
+                        <label class="text-sm font-medium sm:pt-2" style="color: var(--app-ink);">
+                            ${fieldLabel}
+                            <#if field.required><span style="color: var(--app-error);"> *</span></#if>
                         </label>
 
                         <#-- Columna 2: operador -->
                         <div>
                             <#if field.validOperators?size gt 1>
                                 <select name="${opKey}"
-                                        class="operator-select input-app w-full rounded-lg border px-3 py-2 text-sm">
+                                        class="operator-select input-app w-full px-3 py-2 text-sm">
                                     <#list field.validOperators as op>
                                         <option value="${op.name()}" <#if op.name() == selectedOp>selected</#if>>
                                             <@spring.message "search.operator.${op.name()}"/>
@@ -125,7 +132,7 @@
                                 </select>
                             <#elseif field.validOperators?size == 1>
                                 <input type="hidden" name="${opKey}" value="${field.validOperators[0].name()}"/>
-                                <span class="input-app w-full rounded-lg border px-3 py-2 text-sm flex items-center text-secondary">
+                                <span class="input-app w-full px-3 py-2 text-sm flex items-center text-secondary">
                                     <@spring.message "search.operator.${field.validOperators[0].name()}"/>
                                 </span>
                             </#if>
@@ -137,28 +144,28 @@
                                 <#if field.kind.name() == "DATE">
                                     <input type="date" name="${v1Key}" value="${v1Value}"
                                            <#if field.required>required</#if>
-                                           class="value1-input input-app flex-1 rounded-lg border px-3 py-2 text-sm${errorClass}"/>
+                                           class="value1-input input-app flex-1 px-3 py-2 text-sm${errorClass}"/>
                                     <input type="date" name="${v2Key}" value="${v2Value}"
-                                           class="value2-input input-app flex-1 rounded-lg border px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
+                                           class="value2-input input-app flex-1 px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
                                 <#elseif field.kind.name() == "DATETIME">
                                     <input type="datetime-local" name="${v1Key}" value="${v1Value}"
                                            <#if field.required>required</#if>
-                                           class="value1-input input-app flex-1 rounded-lg border px-3 py-2 text-sm${errorClass}"/>
+                                           class="value1-input input-app flex-1 px-3 py-2 text-sm${errorClass}"/>
                                     <input type="datetime-local" name="${v2Key}" value="${v2Value}"
-                                           class="value2-input input-app flex-1 rounded-lg border px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
+                                           class="value2-input input-app flex-1 px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
                                 <#elseif field.kind.name() == "NUMBER">
                                     <input type="number" name="${v1Key}" value="${v1Value}"
                                            <#if field.required>required</#if>
-                                           class="value1-input input-app flex-1 rounded-lg border px-3 py-2 text-sm${errorClass}"/>
+                                           class="value1-input input-app flex-1 px-3 py-2 text-sm${errorClass}"/>
                                     <input type="number" name="${v2Key}" value="${v2Value}"
-                                           class="value2-input input-app flex-1 rounded-lg border px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
+                                           class="value2-input input-app flex-1 px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
                                 <#elseif field.kind.name() == "CHOICE">
                                     <#-- Nota: solo selector de un valor. Si un campo choice admite el
                                          operador "In" para seleccion multiple, se resolvera cuando haga
                                          falta un caso real; hoy se limita a seleccion unica. -->
                                     <select name="${v1Key}"
                                             <#if field.required>required</#if>
-                                            class="value1-input input-app flex-1 rounded-lg border px-3 py-2 text-sm${errorClass}">
+                                            class="value1-input input-app flex-1 px-3 py-2 text-sm${errorClass}">
                                         <option value="">—</option>
                                         <#list field.choiceValues as choice>
                                             <option value="${choice}" <#if choice == v1Value>selected</#if>>
@@ -170,10 +177,10 @@
                                     <input type="text" name="${v1Key}" value="${v1Value}"
                                            <#if field.maxLength gt 0>maxlength="${field.maxLength}"</#if>
                                            <#if field.required>required</#if>
-                                           class="value1-input input-app flex-1 rounded-lg border px-3 py-2 text-sm${errorClass}"/>
+                                           class="value1-input input-app flex-1 px-3 py-2 text-sm${errorClass}"/>
                                     <input type="text" name="${v2Key}" value="${v2Value}"
                                            <#if field.maxLength gt 0>maxlength="${field.maxLength}"</#if>
-                                           class="value2-input input-app flex-1 rounded-lg border px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
+                                           class="value2-input input-app flex-1 px-3 py-2 text-sm<#if !showTwo> hidden</#if>"/>
                                 </#if>
                             </div>
                             <#if fieldHasError>
@@ -185,14 +192,14 @@
                     </div>
                 </#list>
 
-                <div class="flex items-center gap-3 mt-4">
+                <div class="flex items-center gap-3 mt-6">
                     <button type="submit" id="folder-search-submit-btn"
                             data-loading-text="<@spring.message "folder.search.submitting"/>"
-                            class="btn-primary rounded-lg text-sm font-medium px-6 py-2.5">
+                            class="btn-primary text-sm px-6 py-2.5">
                         <span id="folder-search-submit-text"><@spring.message "folder.search.submit"/></span>
                     </button>
                     <button type="reset" id="folder-search-reset-btn"
-                            class="btn-secondary rounded-lg text-sm font-medium px-6 py-2.5">
+                            class="btn-secondary text-sm px-6 py-2.5">
                         <@spring.message "folder.search.reset"/>
                     </button>
                 </div>

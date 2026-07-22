@@ -9,31 +9,32 @@
     <link rel="stylesheet" href="/css/theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex items-center justify-center px-4">
+<body class="min-h-screen flex items-center justify-center px-4 py-10">
 
     <div class="w-full max-w-md">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div class="accent-bar h-1.5"></div>
+        <div class="surface overflow-hidden">
+            <div class="record-strip">
+                <span>SIST <span class="rv">ICN·CMOD</span></span>
+                <span>MODO <span class="rv">CAMBIO</span></span>
+            </div>
 
             <div class="p-8 sm:p-10">
-                <div class="mb-8">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
-                         style="background-color: var(--app-red);">
-                        <span class="text-white font-bold text-lg"><@spring.message "app.logoInitials"/></span>
+                <div class="mb-6">
+                    <div class="brand mb-5">
+                        <span class="brand-mark"><@spring.message "app.logoInitials"/></span>
+                        <span><@spring.message "app.name"/></span>
                     </div>
-                    <h1 class="text-2xl font-bold tracking-tight" style="color: var(--app-black);">
-                        <@spring.message "changePassword.title"/>
-                    </h1>
+                    <h1 class="h-display text-2xl"><@spring.message "changePassword.title"/></h1>
                 </div>
 
                 <#-- Explica POR QUE llego aqui (no pudo autenticar con normalidad) -->
-                <div class="alert-warning mb-6 rounded-lg px-4 py-3 text-sm">
+                <div class="alert alert-warning mb-6 px-4 py-3 text-sm">
                     <@spring.message "changePassword.reason"/>
                 </div>
 
                 <@spring.bind "changePasswordForm"/>
                 <#if spring.status.errorMessages?size gt 0>
-                    <div class="alert-error mb-5 rounded-lg px-4 py-3 text-sm">
+                    <div class="alert alert-error mb-5 px-4 py-3 text-sm">
                         <#list spring.status.errorMessages as msg>
                             <div>${msg}</div>
                         </#list>
@@ -48,23 +49,21 @@
                     <@spring.bind "changePasswordForm.user"/>
                     <input type="hidden" name="user" value="${spring.status.value!''}"/>
                     <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
-                            <@spring.message "login.username.label"/>
-                        </label>
-                        <div class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm text-secondary"
-                             style="background-color: var(--app-light-pearl);">
+                        <label class="app-label"><@spring.message "login.username.label"/></label>
+                        <div class="input-app w-full px-3.5 py-2.5 text-sm text-secondary"
+                             style="background-color: var(--app-ledger);">
                             ${spring.status.value!''}
                         </div>
                     </div>
 
                     <div>
-                        <label for="currentPassword" class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
+                        <label for="currentPassword" class="app-label">
                             <@spring.message "changePassword.currentPassword.label"/>
                         </label>
                         <@spring.bind "changePasswordForm.currentPassword"/>
                         <input type="password" id="currentPassword" name="currentPassword"
                                autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                               class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm
+                               class="input-app w-full px-3.5 py-2.5 text-sm
                                       <#if spring.status.errorMessages?size gt 0>has-error</#if>"/>
                         <#list spring.status.errorMessages as msg>
                             <p class="field-error mt-1.5 text-xs">${msg}</p>
@@ -72,13 +71,13 @@
                     </div>
 
                     <div>
-                        <label for="newPassword" class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
+                        <label for="newPassword" class="app-label">
                             <@spring.message "changePassword.newPassword.label"/>
                         </label>
                         <@spring.bind "changePasswordForm.newPassword"/>
                         <input type="password" id="newPassword" name="newPassword"
                                autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                               class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm
+                               class="input-app w-full px-3.5 py-2.5 text-sm
                                       <#if spring.status.errorMessages?size gt 0>has-error</#if>"/>
                         <#list spring.status.errorMessages as msg>
                             <p class="field-error mt-1.5 text-xs">${msg}</p>
@@ -86,13 +85,13 @@
                     </div>
 
                     <div>
-                        <label for="confirmPassword" class="block text-sm font-medium mb-1.5" style="color: var(--app-charcoal);">
+                        <label for="confirmPassword" class="app-label">
                             <@spring.message "changePassword.confirmPassword.label"/>
                         </label>
                         <@spring.bind "changePasswordForm.confirmPassword"/>
                         <input type="password" id="confirmPassword" name="confirmPassword"
                                autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false"
-                               class="input-app w-full rounded-lg border px-3.5 py-2.5 text-sm
+                               class="input-app w-full px-3.5 py-2.5 text-sm
                                       <#if spring.status.errorMessages?size gt 0>has-error</#if>"/>
                         <#list spring.status.errorMessages as msg>
                             <p class="field-error mt-1.5 text-xs">${msg}</p>
@@ -101,7 +100,7 @@
 
                     <button type="submit" id="change-password-submit-btn"
                             data-loading-text="<@spring.message "changePassword.submitting"/>"
-                            class="btn-primary w-full rounded-lg text-sm font-medium py-3 mt-2 flex items-center justify-center gap-2">
+                            class="btn-primary w-full text-sm py-3 mt-2 flex items-center justify-center gap-2">
                         <svg id="change-password-spinner" class="hidden animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                              fill="none" viewBox="0 0 24 24" aria-hidden="true">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -113,7 +112,7 @@
             </div>
         </div>
 
-        <p class="text-center text-xs text-secondary mt-6"><@spring.message "app.footer"/></p>
+        <p class="meta text-center mt-6"><@spring.message "app.footer"/></p>
     </div>
 
     <script src="/js/change-password-submit.js"></script>
