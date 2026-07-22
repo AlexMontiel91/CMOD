@@ -10,7 +10,7 @@
 
     <@ui.appHeader/>
 
-    <main class="max-w-3xl mx-auto px-6 py-10">
+    <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="flex items-start justify-between gap-4 mb-8">
             <a href="<@spring.url '/'/>" class="link" style="padding-top:6px;">&larr; <@spring.message "folder.search.back"/></a>
             <div class="text-right min-w-0">

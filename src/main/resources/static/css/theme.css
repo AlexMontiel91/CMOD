@@ -275,8 +275,8 @@ html, body {
 .input-app::placeholder { color: #9AA0A8; }
 .input-app:focus {
     outline: none;
-    border-color: var(--app-signal);
-    box-shadow: 0 0 0 3px rgba(216, 16, 32, .14);
+    border-color: var(--app-ink);
+    box-shadow: 0 0 0 3px rgba(90, 100, 114, .20); /* aro gris (steel), no rojo */
 }
 .input-app.has-error { border-color: var(--app-error); }
 

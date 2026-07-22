@@ -5,7 +5,7 @@
 
     <@ui.appHeader/>
 
-    <main class="max-w-3xl mx-auto px-6 py-12">
+    <main class="max-w-7xl mx-auto px-6 py-12">
         <h1 class="h-display text-2xl mb-8"><@spring.message "home.session.ok"/></h1>
 
         <#if passwordExpiringInDays??>

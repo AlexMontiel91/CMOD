@@ -37,7 +37,7 @@
      GlobalModelAttributes, disponibles en toda vista autenticada. -->
 <#macro appHeader>
     <header class="app-header">
-        <div class="app-header__inner max-w-3xl mx-auto px-6 py-3">
+        <div class="app-header__inner max-w-7xl mx-auto px-6 py-3">
             <@brand/>
             <div class="app-header__session">
                 <div class="app-header__top">
