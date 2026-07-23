@@ -4,21 +4,27 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 import org.springframework.stereotype.Repository;
 
 import com.ibm.edms.od.ODCriteria;
 import com.ibm.edms.od.ODFolder;
+import com.ibm.edms.od.ODHit;
 import com.ibm.edms.od.ODServer;
 
 import lombok.RequiredArgsConstructor;
 import com.app.icncards.application.port.out.FolderRepository;
+import com.app.icncards.domain.model.FolderSearchCriterion;
 import com.app.icncards.domain.model.FolderSearchDefinition;
+import com.app.icncards.domain.model.FolderSearchResult;
+import com.app.icncards.domain.model.FolderSearchRow;
 import com.app.icncards.domain.model.FolderSummary;
 import com.app.icncards.domain.model.SearchFieldDefinition;
 import com.app.icncards.domain.model.SearchFieldKind;
@@ -56,6 +62,11 @@ public class CmodFolderRepository implements FolderRepository {
     @Override
     public FolderSearchDefinition findSearchDefinition(String folderName) {
         return onDemand.execute(currentUser.current(), server -> loadSearchDefinition(server, folderName));
+    }
+
+    @Override
+    public FolderSearchResult search(String folderName, List<FolderSearchCriterion> criteria) {
+        return onDemand.execute(currentUser.current(), server -> runSearch(server, folderName, criteria));
     }
 
     private List<FolderSummary> loadFolders(ODServer server) throws Exception {
@@ -217,5 +228,93 @@ public class CmodFolderRepository implements FolderRepository {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Ejecuta la busqueda (criteria search, la recomendada por IBM): fija operador y
+     * valores en cada ODCriteria del folder y llama search(). Las columnas salen de
+     * getDisplayOrder() y cada hit aporta sus display values + docId. searchCountHits()
+     * da el total real (best-effort) para el aviso "primeros N de M".
+     */
+    private FolderSearchResult runSearch(ODServer server, String folderName,
+                                         List<FolderSearchCriterion> criteria) throws Exception {
+        ODFolder folder = server.openFolder(folderName);
+        try {
+            for (FolderSearchCriterion criterion : criteria) {
+                ODCriteria c = folder.getCriteria(criterion.getFieldName());
+                if (c == null) {
+                    continue; // defensivo: el campo ya no existe en el folder
+                }
+                c.setOperator(ODOperatorCodec.toCode(criterion.getOperator()));
+
+                // Fechas: el form envia ISO; ODWEK espera el formato del folder
+                // (getDefaultFmt). Es el espejo de toIsoDefault.
+                SearchFieldKind kind = ODFieldKindMapper.resolve(c);
+                boolean isDate = kind == SearchFieldKind.DATE || kind == SearchFieldKind.DATETIME;
+                boolean withTime = kind == SearchFieldKind.DATETIME;
+                String v1 = isDate ? toOnDemandDate(criterion.getValue1(), c.getDefaultFmt(), withTime)
+                                   : criterion.getValue1();
+                if (criterion.getOperator().requiresTwoValues()) {
+                    String v2 = isDate ? toOnDemandDate(criterion.getValue2(), c.getDefaultFmt(), withTime)
+                                       : criterion.getValue2();
+                    c.setSearchValues(v1, v2);
+                } else {
+                    c.setSearchValue(v1);
+                }
+            }
+
+            long total = safeCountHits(folder);   // total real sin traer datos (best-effort)
+            Vector<?> hits = folder.search();      // trae hasta maxHits (tope de ODConfig/folder)
+            String message = trimToEmpty(folder.getSearchMessage());
+            String[] columns = folder.getDisplayOrder();
+
+            List<FolderSearchRow> rows = new ArrayList<>(hits.size());
+            for (Object element : hits) {
+                ODHit hit = (ODHit) element;
+                List<String> values = new ArrayList<>(columns.length);
+                for (String column : columns) {
+                    String value = hit.getDisplayValue(column);
+                    values.add(value != null ? value : "");
+                }
+                rows.add(new FolderSearchRow(values, hit.getDocId()));
+            }
+
+            int shown = rows.size();
+            int totalHits = total >= shown ? (int) total : shown; // sin conteo: usar lo mostrado
+            boolean truncated = totalHits > shown;
+            return new FolderSearchResult(Arrays.asList(columns), rows, totalHits, shown, truncated, message);
+        } finally {
+            folder.close();
+        }
+    }
+
+    /** searchCountHits (cuenta sin traer datos, devuelve long) es best-effort: si falla, -1. */
+    private static long safeCountHits(ODFolder folder) {
+        try {
+            return folder.searchCountHits();
+        } catch (Exception e) {
+            return -1L;
+        }
+    }
+
+    /** Convierte un valor ISO del form al formato de fecha del folder (getDefaultFmt) que
+     *  espera setSearchValue; ante cualquier fallo devuelve el valor original. */
+    private static String toOnDemandDate(String iso, String odFormat, boolean withTime) {
+        if (iso == null || iso.trim().isEmpty() || odFormat == null || odFormat.isEmpty()) {
+            return iso;
+        }
+        try {
+            DateTimeFormatter target = DateTimeFormatter.ofPattern(strftimeToJava(odFormat), Locale.ROOT);
+            if (withTime) {
+                return LocalDateTime.parse(iso.trim()).format(target);
+            }
+            return LocalDate.parse(iso.trim()).format(target);
+        } catch (Exception e) {
+            return iso;
+        }
+    }
+
+    private static String trimToEmpty(String s) {
+        return s == null ? "" : s.trim();
     }
 }

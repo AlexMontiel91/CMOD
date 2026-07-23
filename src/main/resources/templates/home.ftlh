@@ -41,11 +41,11 @@
             <div id="folder-table-wrapper"
                  class="folder-index"
                  data-page-size="10"
-                 data-info-template="<@spring.message "home.folders.pagination.info"/>"
-                 data-loading-text="<@spring.message "home.folders.loading"/>">
+                 data-info-template="<@spring.message "home.folders.pagination.info"/>">
                 <div id="folder-table-body">
                     <#list folders as folder>
                         <a class="idxrow" href="<@spring.url '/folder/${folder.name?url}'/>"
+                           data-loading
                            data-search="${(folder.name + ' ' + folder.description!'')?lower_case}">
                             <span class="idxn">${(folder?index + 1)?string("00")}</span>
                             <span class="min-w-0">

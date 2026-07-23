@@ -5,7 +5,7 @@
 
     <div class="w-full max-w-md">
         <div class="surface overflow-hidden">
-            <@ui.recordStrip rightLabel="ESTADO" rightValue="ERROR"/>
+            <@ui.recordStrip rightLabelKey="error.recordStrip.label" rightValueKey="error.recordStrip.value"/>
             <div class="p-8 sm:p-10 text-center">
                 <div class="brand-mark mx-auto mb-5" style="width:44px;height:44px;font-size:20px;">!</div>
                 <h1 class="h-display text-xl mb-2"><@spring.message "error.title"/></h1>

@@ -2,7 +2,9 @@ package com.app.icncards.application.port.out;
 
 import java.util.List;
 
+import com.app.icncards.domain.model.FolderSearchCriterion;
 import com.app.icncards.domain.model.FolderSearchDefinition;
+import com.app.icncards.domain.model.FolderSearchResult;
 import com.app.icncards.domain.model.FolderSummary;
 
 /**
@@ -17,4 +19,7 @@ public interface FolderRepository {
 
     /** Definicion del formulario de busqueda (campos, tipos, operadores) de un folder. */
     FolderSearchDefinition findSearchDefinition(String folderName);
+
+    /** Ejecuta la busqueda del folder con los criterios dados y devuelve los resultados. */
+    FolderSearchResult search(String folderName, List<FolderSearchCriterion> criteria);
 }

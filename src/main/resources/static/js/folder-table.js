@@ -32,27 +32,6 @@
         return (n < 10 ? '0' : '') + n;
     }
 
-    // Overlay "Cargando..." al abrir un folder: la navegacion a /folder/{n} dispara
-    // una consulta a OnDemand que en dev puede tardar; el overlay le dice al usuario
-    // que su solicitud se esta procesando. Se retira solo al cargar la nueva pagina.
-    function showLoadingOverlay(text) {
-        if (document.querySelector('.loading-overlay')) {
-            return;
-        }
-        var overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        var box = document.createElement('div');
-        box.className = 'loading-overlay__box';
-        var spinner = document.createElement('span');
-        spinner.className = 'loading-overlay__spinner';
-        var label = document.createElement('span');
-        label.textContent = text;
-        box.appendChild(spinner);
-        box.appendChild(label);
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
-    }
-
     function initFolderTable() {
         var wrapper = document.getElementById('folder-table-wrapper');
         var body = document.getElementById('folder-table-body');
@@ -154,18 +133,6 @@
                 render();
             });
         }
-
-        // Aviso "Cargando..." al abrir un folder (navegacion normal del enlace).
-        var loadingText = wrapper.getAttribute('data-loading-text') || 'Cargando…';
-        allRows.forEach(function (row) {
-            row.addEventListener('click', function (e) {
-                // respeta abrir en pestana nueva / clic no primario: ahi no navega esta pagina
-                if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) {
-                    return;
-                }
-                showLoadingOverlay(loadingText);
-            });
-        });
 
         render();
     }

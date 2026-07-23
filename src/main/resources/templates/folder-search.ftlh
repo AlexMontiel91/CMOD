@@ -12,7 +12,7 @@
 
     <main class="max-w-7xl mx-auto px-6 py-10">
         <div class="flex items-start justify-between gap-4 mb-8">
-            <a href="<@spring.url '/'/>" class="link" style="padding-top:6px;">&larr; <@spring.message "folder.search.back"/></a>
+            <a href="<@spring.url '/'/>" class="link" data-loading style="padding-top:6px;">&larr; <@spring.message "folder.search.back"/></a>
             <div class="text-right min-w-0">
                 <h1 class="h-display text-2xl">${folderTitle}</h1>
                 <#if folderDesc?has_content && folderDesc != folderTitle>
@@ -21,9 +21,9 @@
             </div>
         </div>
 
-        <#if submitted?? && submitted>
-            <div class="alert alert-info px-4 py-3 text-sm mb-6">
-                <@spring.message "folder.search.submitted.info"/>
+        <#if searchError?? && searchError>
+            <div class="alert alert-error px-4 py-3 text-sm mb-6">
+                <@spring.message "folder.search.error"/>
             </div>
         </#if>
 
@@ -43,6 +43,7 @@
             <form id="folder-search-form" method="post"
                   action="<@spring.url '/folder/${definition.folderName?url}/search'/>"
                   data-two-value-operators="${twoValueOperators!''}"
+                  data-loading data-loading-text="<@spring.message "folder.search.submitting"/>"
                   class="surface p-6 sm:p-8">
 
                 <@ui.csrf/>

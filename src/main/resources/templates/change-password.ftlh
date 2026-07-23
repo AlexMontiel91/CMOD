@@ -5,7 +5,7 @@
 
     <div class="w-full max-w-md">
         <div class="surface overflow-hidden">
-            <@ui.recordStrip rightLabel="MODO" rightValue="CAMBIO"/>
+            <@ui.recordStrip rightLabelKey="changePassword.recordStrip.label" rightValueKey="changePassword.recordStrip.value"/>
 
             <div class="p-8 sm:p-10">
                 <div class="mb-6">

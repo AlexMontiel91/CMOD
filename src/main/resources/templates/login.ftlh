@@ -5,7 +5,7 @@
 
     <div class="w-full max-w-md">
         <div class="surface overflow-hidden">
-            <@ui.recordStrip rightLabel="SESIÓN" rightValue="—"/>
+            <@ui.recordStrip rightLabelKey="login.recordStrip.label" rightValueKey="login.recordStrip.value"/>
 
             <div class="p-8 sm:p-10">
                 <div class="mb-7">

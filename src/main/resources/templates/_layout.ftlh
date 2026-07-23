@@ -38,7 +38,9 @@
 <#macro appHeader>
     <header class="app-header">
         <div class="app-header__inner max-w-7xl mx-auto px-6 py-3">
-            <@brand/>
+            <a href="<@spring.url '/'/>" class="app-header__brandlink" data-loading>
+                <@brand/>
+            </a>
             <div class="app-header__session">
                 <div class="app-header__top">
                     <#if username?? && username?has_content>
@@ -68,11 +70,12 @@
     </header>
 </#macro>
 
-<#-- Tira de registro (tope de las tarjetas de acceso/estado). -->
-<#macro recordStrip rightLabel rightValue>
+<#-- Tira de registro (tope de las tarjetas de acceso/estado). Todo el texto sale de
+     messages.properties; rightLabelKey/rightValueKey son CLAVES de mensaje. -->
+<#macro recordStrip rightLabelKey rightValueKey>
     <div class="record-strip">
-        <span>SIST <span class="rv">ICN·CMOD</span></span>
-        <span>${rightLabel} <span class="rv">${rightValue}</span></span>
+        <span><@spring.message "recordStrip.label"/> <span class="rv"><@spring.message "recordStrip.system"/></span></span>
+        <span><@spring.message rightLabelKey/> <span class="rv"><@spring.message rightValueKey/></span></span>
     </div>
 </#macro>
 
@@ -108,6 +111,8 @@
     </form>
     <script src="<@spring.url '/js/idle-timeout.js'/>"></script>
 </#if>
+<#-- Overlay "Cargando…" para enlaces/forms con data-loading (acciones a OnDemand) -->
+<script src="<@spring.url '/js/loading.js'/>"></script>
 </body>
 </html>
 </#macro>
